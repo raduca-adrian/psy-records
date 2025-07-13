@@ -112,6 +112,43 @@ class DatabaseManager:
             )
         """)
         
+        # Create assessments table for patient assessments
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS assessments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                person_id INTEGER NOT NULL,
+                assessment_date DATE NOT NULL,
+                chief_complaint TEXT,
+                medical_history TEXT,
+                physical_examination TEXT,
+                diagnosis TEXT,
+                treatment_plan TEXT,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (person_id) REFERENCES persons (id) ON DELETE CASCADE
+            )
+        """)
+        
+        # Create consultations table for follow-up consultations
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS consultations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                person_id INTEGER NOT NULL,
+                consultation_date DATE NOT NULL,
+                consultation_type TEXT NOT NULL DEFAULT 'Follow-up',
+                symptoms TEXT,
+                examination_findings TEXT,
+                recommendations TEXT,
+                medications TEXT,
+                next_appointment DATE,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (person_id) REFERENCES persons (id) ON DELETE CASCADE
+            )
+        """)
+        
         self.connection.commit()
     
     def create_user(self, username: str, password: str) -> bool:
@@ -289,3 +326,255 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error initializing database: {e}")
             return False
+        
+    # Assessment Management Methods
+    def add_assessment(self, person_id: int, assessment_date: str, chief_complaint: str = "",
+                      medical_history: str = "", physical_examination: str = "", 
+                      diagnosis: str = "", treatment_plan: str = "", notes: str = "") -> bool:
+        """Add a new assessment for a person."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                INSERT INTO assessments (person_id, assessment_date, chief_complaint, 
+                                       medical_history, physical_examination, diagnosis, 
+                                       treatment_plan, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (person_id, assessment_date, chief_complaint, medical_history, 
+                  physical_examination, diagnosis, treatment_plan, notes))
+            self.connection.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding assessment: {e}")
+            return False
+    
+    def get_assessments_for_person(self, person_id: int) -> List[Tuple]:
+        """Get all assessments for a specific person."""
+        if not self.connection:
+            return []
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                SELECT id, assessment_date, chief_complaint, medical_history, 
+                       physical_examination, diagnosis, treatment_plan, notes, 
+                       created_at, updated_at
+                FROM assessments 
+                WHERE person_id = ? 
+                ORDER BY assessment_date DESC
+            """, (person_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error getting assessments: {e}")
+            return []
+    
+    def update_assessment(self, assessment_id: int, assessment_date: str = None,
+                         chief_complaint: str = None, medical_history: str = None,
+                         physical_examination: str = None, diagnosis: str = None,
+                         treatment_plan: str = None, notes: str = None) -> bool:
+        """Update an existing assessment."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            
+            # Build dynamic update query
+            updates = []
+            values = []
+            
+            if assessment_date is not None:
+                updates.append("assessment_date = ?")
+                values.append(assessment_date)
+            if chief_complaint is not None:
+                updates.append("chief_complaint = ?")
+                values.append(chief_complaint)
+            if medical_history is not None:
+                updates.append("medical_history = ?")
+                values.append(medical_history)
+            if physical_examination is not None:
+                updates.append("physical_examination = ?")
+                values.append(physical_examination)
+            if diagnosis is not None:
+                updates.append("diagnosis = ?")
+                values.append(diagnosis)
+            if treatment_plan is not None:
+                updates.append("treatment_plan = ?")
+                values.append(treatment_plan)
+            if notes is not None:
+                updates.append("notes = ?")
+                values.append(notes)
+            
+            if not updates:
+                return True  # No updates to make
+            
+            updates.append("updated_at = CURRENT_TIMESTAMP")
+            values.append(assessment_id)
+            
+            query = f"UPDATE assessments SET {', '.join(updates)} WHERE id = ?"
+            cursor.execute(query, values)
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating assessment: {e}")
+            return False
+    
+    def delete_assessment(self, assessment_id: int) -> bool:
+        """Delete an assessment."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM assessments WHERE id = ?", (assessment_id,))
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error deleting assessment: {e}")
+            return False
+    
+    # Consultation Management Methods
+    def add_consultation(self, person_id: int, consultation_date: str, 
+                        consultation_type: str = "Follow-up", symptoms: str = "",
+                        examination_findings: str = "", recommendations: str = "",
+                        medications: str = "", next_appointment: str = None, 
+                        notes: str = "") -> bool:
+        """Add a new consultation for a person."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                INSERT INTO consultations (person_id, consultation_date, consultation_type,
+                                         symptoms, examination_findings, recommendations,
+                                         medications, next_appointment, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (person_id, consultation_date, consultation_type, symptoms,
+                  examination_findings, recommendations, medications, next_appointment, notes))
+            self.connection.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding consultation: {e}")
+            return False
+    
+    def get_consultations_for_person(self, person_id: int) -> List[Tuple]:
+        """Get all consultations for a specific person."""
+        if not self.connection:
+            return []
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                SELECT id, consultation_date, consultation_type, symptoms,
+                       examination_findings, recommendations, medications,
+                       next_appointment, notes, created_at, updated_at
+                FROM consultations 
+                WHERE person_id = ? 
+                ORDER BY consultation_date DESC
+            """, (person_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error getting consultations: {e}")
+            return []
+    
+    def update_consultation(self, consultation_id: int, consultation_date: str = None,
+                           consultation_type: str = None, symptoms: str = None,
+                           examination_findings: str = None, recommendations: str = None,
+                           medications: str = None, next_appointment: str = None,
+                           notes: str = None) -> bool:
+        """Update an existing consultation."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            
+            # Build dynamic update query
+            updates = []
+            values = []
+            
+            if consultation_date is not None:
+                updates.append("consultation_date = ?")
+                values.append(consultation_date)
+            if consultation_type is not None:
+                updates.append("consultation_type = ?")
+                values.append(consultation_type)
+            if symptoms is not None:
+                updates.append("symptoms = ?")
+                values.append(symptoms)
+            if examination_findings is not None:
+                updates.append("examination_findings = ?")
+                values.append(examination_findings)
+            if recommendations is not None:
+                updates.append("recommendations = ?")
+                values.append(recommendations)
+            if medications is not None:
+                updates.append("medications = ?")
+                values.append(medications)
+            if next_appointment is not None:
+                updates.append("next_appointment = ?")
+                values.append(next_appointment)
+            if notes is not None:
+                updates.append("notes = ?")
+                values.append(notes)
+            
+            if not updates:
+                return True  # No updates to make
+            
+            updates.append("updated_at = CURRENT_TIMESTAMP")
+            values.append(consultation_id)
+            
+            query = f"UPDATE consultations SET {', '.join(updates)} WHERE id = ?"
+            cursor.execute(query, values)
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating consultation: {e}")
+            return False
+    
+    def delete_consultation(self, consultation_id: int) -> bool:
+        """Delete a consultation."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM consultations WHERE id = ?", (consultation_id,))
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error deleting consultation: {e}")
+            return False
+    
+    def get_person_complete_record(self, person_id: int) -> dict:
+        """Get complete medical record for a person including assessments and consultations."""
+        if not self.connection:
+            return {}
+        
+        try:
+            cursor = self.connection.cursor()
+            
+            # Get person details
+            cursor.execute("SELECT * FROM persons WHERE id = ?", (person_id,))
+            person = cursor.fetchone()
+            
+            if not person:
+                return {}
+            
+            # Get assessments
+            assessments = self.get_assessments_for_person(person_id)
+            
+            # Get consultations
+            consultations = self.get_consultations_for_person(person_id)
+            
+            return {
+                'person': person,
+                'assessments': assessments,
+                'consultations': consultations
+            }
+        except Exception as e:
+            print(f"Error getting complete record: {e}")
+            return {}
