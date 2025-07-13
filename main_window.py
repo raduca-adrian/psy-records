@@ -33,30 +33,77 @@ class MainWindow(QMainWindow):
         # Main layout
         main_layout = QVBoxLayout()
         
-        # Header
+        # Header with enhanced styling
         header_layout = QHBoxLayout()
         
-        title_label = QLabel("Person Management System")
+        title_label = QLabel("PersonDB - Secure Database Manager")
         title_font = QFont()
-        title_font.setPointSize(18)
+        title_font.setPointSize(20)
         title_font.setBold(True)
         title_label.setFont(title_font)
-        title_label.setStyleSheet("color: #2c3e50; padding: 10px;")
+        title_label.setStyleSheet("""
+            QLabel {
+                color: #212529;
+                padding: 10px;
+                background-color: transparent;
+                font-weight: 700;
+            }
+        """)
         
-        user_label = QLabel(f"Logged in as: {self.username}")
-        user_label.setStyleSheet("color: #7f8c8d; padding: 10px;")
+        user_label = QLabel(f"👤 Logged in as: {self.username}")
+        user_label.setStyleSheet("""
+            QLabel {
+                color: #6c757d;
+                font-weight: 500;
+                background-color: #e9ecef;
+                padding: 6px 12px;
+                border-radius: 15px;
+                border: 1px solid #dee2e6;
+                margin: 5px;
+            }
+        """)
         
         header_layout.addWidget(title_label)
         header_layout.addStretch()
         header_layout.addWidget(user_label)
         
-        # Search bar
+        # Search bar with enhanced styling
         search_layout = QHBoxLayout()
-        search_label = QLabel("Search:")
+        search_label = QLabel("🔍 Search:")
+        search_label.setStyleSheet("""
+            QLabel {
+                color: #495057;
+                font-weight: 600;
+                font-size: 13px;
+                margin-right: 8px;
+            }
+        """)
+        
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search by name or CNP...")
         self.search_input.textChanged.connect(self.filter_table)
-        self.search_input.setMaximumWidth(300)
+        self.search_input.setMaximumWidth(350)
+        self.search_input.setMinimumHeight(35)
+        self.search_input.setStyleSheet("""
+            QLineEdit {
+                padding: 10px 15px;
+                border: 2px solid #ced4da;
+                border-radius: 8px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+            }
+            QLineEdit:focus {
+                border-color: #0d6efd;
+                background-color: #ffffff;
+            }
+            QLineEdit::placeholder {
+                color: #6c757d;
+                font-style: italic;
+            }
+        """)
         
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.search_input)
@@ -288,7 +335,6 @@ class MainWindow(QMainWindow):
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
-                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
             }
             QLineEdit::placeholder {
                 color: #6c757d;

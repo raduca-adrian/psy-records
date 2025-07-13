@@ -70,11 +70,9 @@ class LoginDialog(QDialog):
             }
             QPushButton:hover {
                 background-color: #157347;
-                transform: translateY(-1px);
             }
             QPushButton:pressed {
                 background-color: #146c43;
-                transform: translateY(0px);
             }
         """)
         
@@ -125,11 +123,9 @@ class LoginDialog(QDialog):
             }
             QPushButton:hover {
                 background-color: #0b5ed7;
-                transform: translateY(-1px);
             }
             QPushButton:pressed {
                 background-color: #0a58ca;
-                transform: translateY(0px);
             }
         """)
         
@@ -172,7 +168,6 @@ class LoginDialog(QDialog):
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
-                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
             }
             QLineEdit::placeholder {
                 color: #6c757d;

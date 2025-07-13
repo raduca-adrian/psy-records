@@ -124,7 +124,6 @@ class PersonDialog(QDialog):
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
-                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
             }
             QLineEdit::placeholder {
                 color: #6c757d;
