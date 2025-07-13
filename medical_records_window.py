@@ -99,33 +99,64 @@ class MedicalRecordsWindow(QMainWindow):
             }
             QFrame {
                 background-color: white;
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 10px;
+                border: 2px solid #e9ecef;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             QLabel {
                 color: #212529;
+                font-weight: 500;
             }
             QPushButton {
                 background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 8px 16px;
-                border-radius: 6px;
+                padding: 12px 20px;
+                border-radius: 8px;
                 font-weight: 600;
-                font-size: 12px;
-                min-width: 120px;
+                font-size: 13px;
+                min-width: 140px;
+                margin: 2px;
             }
             QPushButton:hover {
                 background-color: #0b5ed7;
+                transform: translateY(-1px);
             }
             QPushButton:pressed {
                 background-color: #0a58ca;
+                transform: translateY(0px);
+            }
+            QPushButton[text*="Assessment"] {
+                background-color: #198754;
+            }
+            QPushButton[text*="Assessment"]:hover {
+                background-color: #157347;
+            }
+            QPushButton[text*="Consultation"] {
+                background-color: #6f42c1;
+            }
+            QPushButton[text*="Consultation"]:hover {
+                background-color: #5a359a;
+            }
+            QPushButton[text*="PDF"] {
+                background-color: #fd7e14;
+            }
+            QPushButton[text*="PDF"]:hover {
+                background-color: #e8650e;
+            }
+            QPushButton[text*="Refresh"] {
+                background-color: #6c757d;
+            }
+            QPushButton[text*="Refresh"]:hover {
+                background-color: #5c636a;
             }
             QTabWidget::pane {
-                border: 1px solid #dee2e6;
+                border: 2px solid #dee2e6;
                 background-color: white;
+                border-radius: 8px;
+                padding: 5px;
             }
             QTabWidget::tab-bar {
                 alignment: left;
@@ -133,39 +164,57 @@ class MedicalRecordsWindow(QMainWindow):
             QTabBar::tab {
                 background-color: #e9ecef;
                 color: #495057;
-                padding: 10px 20px;
-                margin-right: 2px;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
+                padding: 12px 24px;
+                margin-right: 4px;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 120px;
             }
             QTabBar::tab:selected {
                 background-color: white;
                 color: #212529;
-                border-bottom: none;
+                border-bottom: 2px solid white;
+                margin-bottom: -2px;
             }
             QTabBar::tab:hover {
                 background-color: #f8f9fa;
+                color: #0d6efd;
             }
             QTableWidget {
                 background-color: white;
                 alternate-background-color: #f8f9fa;
                 gridline-color: #dee2e6;
-                border: 1px solid #dee2e6;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
                 selection-background-color: #e3f2fd;
                 selection-color: #1976d2;
+                font-size: 12px;
             }
             QTableWidget::item {
-                padding: 8px;
+                padding: 12px 8px;
                 border-bottom: 1px solid #f1f3f4;
+            }
+            QTableWidget::item:selected {
+                background-color: #e3f2fd;
+                color: #1976d2;
+                border: 2px solid #0d6efd;
             }
             QHeaderView::section {
                 background-color: #e9ecef;
                 color: #495057;
-                padding: 10px;
+                padding: 15px 10px;
                 border: none;
                 border-right: 1px solid #dee2e6;
-                font-weight: 600;
-                font-size: 11px;
+                font-weight: 700;
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            QHeaderView::section:hover {
+                background-color: #dee2e6;
+                color: #212529;
             }
         """)
     
@@ -258,12 +307,40 @@ class MedicalRecordsWindow(QMainWindow):
             actions_layout = QHBoxLayout(actions_widget)
             actions_layout.setContentsMargins(4, 4, 4, 4)
             
-            edit_btn = QPushButton("Edit")
-            edit_btn.setStyleSheet("QPushButton { min-width: 50px; padding: 4px 8px; font-size: 10px; }")
+            edit_btn = QPushButton("✏️ Edit")
+            edit_btn.setStyleSheet("""
+                QPushButton { 
+                    min-width: 60px; 
+                    padding: 6px 12px; 
+                    font-size: 11px;
+                    background-color: #0d6efd;
+                    color: white;
+                    border-radius: 4px;
+                    font-weight: 600;
+                    margin: 1px;
+                }
+                QPushButton:hover {
+                    background-color: #0b5ed7;
+                }
+            """)
             edit_btn.clicked.connect(lambda checked, aid=assessment_id, data=assessment: self.edit_assessment(aid, data))
             
-            delete_btn = QPushButton("Delete")
-            delete_btn.setStyleSheet("QPushButton { min-width: 50px; padding: 4px 8px; font-size: 10px; background-color: #dc3545; }")
+            delete_btn = QPushButton("🗑️ Delete")
+            delete_btn.setStyleSheet("""
+                QPushButton { 
+                    min-width: 60px; 
+                    padding: 6px 12px; 
+                    font-size: 11px; 
+                    background-color: #dc3545;
+                    color: white;
+                    border-radius: 4px;
+                    font-weight: 600;
+                    margin: 1px;
+                }
+                QPushButton:hover {
+                    background-color: #bb2d3b;
+                }
+            """)
             delete_btn.clicked.connect(lambda checked, aid=assessment_id: self.delete_assessment(aid))
             
             actions_layout.addWidget(edit_btn)
@@ -307,12 +384,40 @@ class MedicalRecordsWindow(QMainWindow):
             actions_layout = QHBoxLayout(actions_widget)
             actions_layout.setContentsMargins(4, 4, 4, 4)
             
-            edit_btn = QPushButton("Edit")
-            edit_btn.setStyleSheet("QPushButton { min-width: 50px; padding: 4px 8px; font-size: 10px; }")
+            edit_btn = QPushButton("✏️ Edit")
+            edit_btn.setStyleSheet("""
+                QPushButton { 
+                    min-width: 60px; 
+                    padding: 6px 12px; 
+                    font-size: 11px;
+                    background-color: #0d6efd;
+                    color: white;
+                    border-radius: 4px;
+                    font-weight: 600;
+                    margin: 1px;
+                }
+                QPushButton:hover {
+                    background-color: #0b5ed7;
+                }
+            """)
             edit_btn.clicked.connect(lambda checked, cid=consultation_id, data=consultation: self.edit_consultation(cid, data))
             
-            delete_btn = QPushButton("Delete")
-            delete_btn.setStyleSheet("QPushButton { min-width: 50px; padding: 4px 8px; font-size: 10px; background-color: #dc3545; }")
+            delete_btn = QPushButton("🗑️ Delete")
+            delete_btn.setStyleSheet("""
+                QPushButton { 
+                    min-width: 60px; 
+                    padding: 6px 12px; 
+                    font-size: 11px; 
+                    background-color: #dc3545;
+                    color: white;
+                    border-radius: 4px;
+                    font-weight: 600;
+                    margin: 1px;
+                }
+                QPushButton:hover {
+                    background-color: #bb2d3b;
+                }
+            """)
             delete_btn.clicked.connect(lambda checked, cid=consultation_id: self.delete_consultation(cid))
             
             actions_layout.addWidget(edit_btn)

@@ -38,28 +38,35 @@ class MainWindow(QMainWindow):
         
         title_label = QLabel("PersonDB - Secure Database Manager")
         title_font = QFont()
-        title_font.setPointSize(20)
+        title_font.setPointSize(22)
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setStyleSheet("""
             QLabel {
                 color: #212529;
-                padding: 10px;
-                background-color: transparent;
-                font-weight: 700;
+                padding: 15px 20px;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
+                    stop:0 #e9ecef, stop:1 #f8f9fa);
+                border-radius: 10px;
+                border: 2px solid #dee2e6;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1px;
             }
         """)
         
         user_label = QLabel(f"👤 Logged in as: {self.username}")
         user_label.setStyleSheet("""
             QLabel {
-                color: #6c757d;
-                font-weight: 500;
+                color: #495057;
+                font-weight: 600;
                 background-color: #e9ecef;
-                padding: 6px 12px;
-                border-radius: 15px;
-                border: 1px solid #dee2e6;
-                margin: 5px;
+                padding: 10px 16px;
+                border-radius: 20px;
+                border: 2px solid #dee2e6;
+                margin: 8px;
+                font-size: 13px;
+                min-width: 150px;
             }
         """)
         
@@ -73,35 +80,42 @@ class MainWindow(QMainWindow):
         search_label.setStyleSheet("""
             QLabel {
                 color: #495057;
-                font-weight: 600;
-                font-size: 13px;
-                margin-right: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                margin-right: 12px;
+                padding: 8px;
+                background-color: #e9ecef;
+                border-radius: 6px;
+                min-width: 80px;
             }
         """)
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search by name or CNP...")
         self.search_input.textChanged.connect(self.filter_table)
-        self.search_input.setMaximumWidth(350)
-        self.search_input.setMinimumHeight(35)
+        self.search_input.setMaximumWidth(400)
+        self.search_input.setMinimumHeight(40)
         self.search_input.setStyleSheet("""
             QLineEdit {
-                padding: 10px 15px;
-                border: 2px solid #ced4da;
-                border-radius: 8px;
-                font-size: 13px;
+                padding: 12px 20px;
+                border: 3px solid #ced4da;
+                border-radius: 10px;
+                font-size: 14px;
                 background-color: white;
                 color: #212529;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                font-weight: 500;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #6c757d;
                 font-style: italic;
+                font-weight: 400;
             }
         """)
         
@@ -112,28 +126,33 @@ class MainWindow(QMainWindow):
         # Buttons layout
         button_layout = QHBoxLayout()
         
-        self.add_button = QPushButton("Add Person")
+        self.add_button = QPushButton("➕ Add Person")
         self.add_button.clicked.connect(self.add_person)
         self.add_button.setStyleSheet("""
             QPushButton {
                 background-color: #198754;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 100px;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                min-width: 120px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
                 background-color: #157347;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
             }
             QPushButton:pressed {
                 background-color: #146c43;
+                transform: translateY(0px);
             }
         """)
         
-        self.edit_button = QPushButton("Edit Person")
+        self.edit_button = QPushButton("✏️ Edit Person")
         self.edit_button.clicked.connect(self.edit_person)
         self.edit_button.setEnabled(False)
         self.edit_button.setStyleSheet("""
@@ -141,25 +160,32 @@ class MainWindow(QMainWindow):
                 background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 100px;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                min-width: 120px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
                 background-color: #0b5ed7;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
             }
             QPushButton:pressed {
                 background-color: #0a58ca;
+                transform: translateY(0px);
             }
             QPushButton:disabled {
                 background-color: #6c757d;
                 color: #adb5bd;
+                transform: none;
+                box-shadow: none;
             }
         """)
         
-        self.delete_button = QPushButton("Delete Person")
+        self.delete_button = QPushButton("🗑️ Delete Person")
         self.delete_button.clicked.connect(self.delete_person)
         self.delete_button.setEnabled(False)
         self.delete_button.setStyleSheet("""
@@ -167,42 +193,54 @@ class MainWindow(QMainWindow):
                 background-color: #dc3545;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 100px;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                min-width: 120px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
                 background-color: #bb2d3b;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
             }
             QPushButton:pressed {
                 background-color: #b02a37;
+                transform: translateY(0px);
             }
             QPushButton:disabled {
                 background-color: #6c757d;
                 color: #adb5bd;
+                transform: none;
+                box-shadow: none;
             }
         """)
         
-        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button = QPushButton("🔄 Refresh")
         self.refresh_button.clicked.connect(self.load_persons)
         self.refresh_button.setStyleSheet("""
             QPushButton {
                 background-color: #fd7e14;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 100px;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                min-width: 120px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
                 background-color: #e8650e;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
             }
             QPushButton:pressed {
                 background-color: #dc5f0d;
+                transform: translateY(0px);
             }
         """)
         
@@ -214,21 +252,28 @@ class MainWindow(QMainWindow):
                 background-color: #6f42c1;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 120px;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                min-width: 140px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
                 background-color: #5a359a;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
             }
             QPushButton:pressed {
                 background-color: #4c2d83;
+                transform: translateY(0px);
             }
             QPushButton:disabled {
                 background-color: #6c757d;
                 color: #adb5bd;
+                transform: none;
+                box-shadow: none;
             }
         """)
         
@@ -267,28 +312,39 @@ class MainWindow(QMainWindow):
                 alternate-background-color: #f8f9fa;
                 selection-background-color: #e3f2fd;
                 selection-color: #1976d2;
-                border: 1px solid #dee2e6;
-                border-radius: 6px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 13px;
             }
             QTableWidget::item {
-                padding: 8px;
+                padding: 12px 8px;
                 border-bottom: 1px solid #f1f3f4;
+                border-right: 1px solid #f8f9fa;
             }
             QTableWidget::item:selected {
                 background-color: #e3f2fd;
                 color: #1976d2;
+                border: 2px solid #0d6efd;
+                font-weight: 600;
+            }
+            QTableWidget::item:hover {
+                background-color: #f0f7ff;
             }
             QHeaderView::section {
                 background-color: #e9ecef;
                 color: #495057;
-                padding: 10px;
+                padding: 15px 10px;
                 border: none;
                 border-right: 1px solid #dee2e6;
-                font-weight: 600;
+                border-bottom: 2px solid #0d6efd;
+                font-weight: 700;
                 font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             QHeaderView::section:hover {
                 background-color: #dee2e6;
+                color: #212529;
             }
         """)
         self.table.setAlternatingRowColors(True)
