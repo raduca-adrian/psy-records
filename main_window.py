@@ -69,16 +69,20 @@ class MainWindow(QMainWindow):
         self.add_button.clicked.connect(self.add_person)
         self.add_button.setStyleSheet("""
             QPushButton {
-                background-color: #27ae60;
+                background-color: #198754;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 12px;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 100px;
             }
             QPushButton:hover {
-                background-color: #229954;
+                background-color: #157347;
+            }
+            QPushButton:pressed {
+                background-color: #146c43;
             }
         """)
         
@@ -87,19 +91,24 @@ class MainWindow(QMainWindow):
         self.edit_button.setEnabled(False)
         self.edit_button.setStyleSheet("""
             QPushButton {
-                background-color: #3498db;
+                background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 12px;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 100px;
             }
             QPushButton:hover {
-                background-color: #2980b9;
+                background-color: #0b5ed7;
+            }
+            QPushButton:pressed {
+                background-color: #0a58ca;
             }
             QPushButton:disabled {
-                background-color: #bdc3c7;
+                background-color: #6c757d;
+                color: #adb5bd;
             }
         """)
         
@@ -108,19 +117,24 @@ class MainWindow(QMainWindow):
         self.delete_button.setEnabled(False)
         self.delete_button.setStyleSheet("""
             QPushButton {
-                background-color: #e74c3c;
+                background-color: #dc3545;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 12px;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 100px;
             }
             QPushButton:hover {
-                background-color: #c0392b;
+                background-color: #bb2d3b;
+            }
+            QPushButton:pressed {
+                background-color: #b02a37;
             }
             QPushButton:disabled {
-                background-color: #bdc3c7;
+                background-color: #6c757d;
+                color: #adb5bd;
             }
         """)
         
@@ -128,16 +142,20 @@ class MainWindow(QMainWindow):
         self.refresh_button.clicked.connect(self.load_persons)
         self.refresh_button.setStyleSheet("""
             QPushButton {
-                background-color: #f39c12;
+                background-color: #fd7e14;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-weight: bold;
-                font-size: 12px;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 100px;
             }
             QPushButton:hover {
-                background-color: #e67e22;
+                background-color: #e8650e;
+            }
+            QPushButton:pressed {
+                background-color: #dc5f0d;
             }
         """)
         
@@ -167,21 +185,36 @@ class MainWindow(QMainWindow):
         self.table.itemSelectionChanged.connect(self.on_selection_changed)
         self.table.itemDoubleClicked.connect(self.edit_person)
         
-        # Table styling
+        # Enhanced table styling with better visibility
         self.table.setStyleSheet("""
             QTableWidget {
-                gridline-color: #bdc3c7;
+                gridline-color: #dee2e6;
                 background-color: white;
                 alternate-background-color: #f8f9fa;
-                selection-background-color: #3498db;
-                selection-color: white;
+                selection-background-color: #e3f2fd;
+                selection-color: #1976d2;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+            }
+            QTableWidget::item {
+                padding: 8px;
+                border-bottom: 1px solid #f1f3f4;
+            }
+            QTableWidget::item:selected {
+                background-color: #e3f2fd;
+                color: #1976d2;
             }
             QHeaderView::section {
-                background-color: #34495e;
-                color: white;
-                padding: 8px;
+                background-color: #e9ecef;
+                color: #495057;
+                padding: 10px;
                 border: none;
-                font-weight: bold;
+                border-right: 1px solid #dee2e6;
+                font-weight: 600;
+                font-size: 12px;
+            }
+            QHeaderView::section:hover {
+                background-color: #dee2e6;
             }
         """)
         self.table.setAlternatingRowColors(True)
@@ -202,19 +235,123 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Ready")
         
-        # Apply main window styling
+        # Apply enhanced main window styling for better visibility
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #ecf0f1;
+                background-color: #f8f9fa;
+                color: #212529;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            QMenuBar {
+                background-color: #e9ecef;
+                color: #212529;
+                border-bottom: 1px solid #dee2e6;
+                padding: 4px;
+            }
+            QMenuBar::item {
+                background-color: transparent;
+                color: #495057;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-weight: 500;
+            }
+            QMenuBar::item:selected {
+                background-color: #0d6efd;
+                color: white;
+            }
+            QMenu {
+                background-color: white;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 8px 16px;
+                color: #495057;
+                border-radius: 4px;
+            }
+            QMenu::item:selected {
+                background-color: #0d6efd;
+                color: white;
             }
             QLineEdit {
-                padding: 8px;
-                border: 2px solid #bdc3c7;
-                border-radius: 4px;
-                font-size: 12px;
+                padding: 10px 12px;
+                border: 2px solid #6c757d;
+                border-radius: 6px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 20px;
             }
             QLineEdit:focus {
-                border-color: #3498db;
+                border-color: #0d6efd;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+            }
+            QLineEdit::placeholder {
+                color: #6c757d;
+                font-style: italic;
+            }
+            QTableWidget {
+                background-color: white;
+                alternate-background-color: #f8f9fa;
+                gridline-color: #dee2e6;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                selection-background-color: #e3f2fd;
+                selection-color: #1976d2;
+            }
+            QTableWidget::item {
+                padding: 8px;
+                border-bottom: 1px solid #f1f3f4;
+            }
+            QTableWidget::item:selected {
+                background-color: #e3f2fd;
+                color: #1976d2;
+            }
+            QHeaderView::section {
+                background-color: #e9ecef;
+                color: #495057;
+                padding: 10px;
+                border: none;
+                border-right: 1px solid #dee2e6;
+                font-weight: 600;
+                font-size: 12px;
+            }
+            QHeaderView::section:hover {
+                background-color: #dee2e6;
+            }
+            QPushButton {
+                background-color: #0d6efd;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 100px;
+            }
+            QPushButton:hover {
+                background-color: #0b5ed7;
+            }
+            QPushButton:pressed {
+                background-color: #0a58ca;
+            }
+            QPushButton:disabled {
+                background-color: #6c757d;
+                color: #adb5bd;
+            }
+            QLabel {
+                color: #495057;
+                font-weight: 500;
+            }
+            QStatusBar {
+                background-color: #e9ecef;
+                color: #495057;
+                border-top: 1px solid #dee2e6;
+                padding: 4px;
             }
         """)
     

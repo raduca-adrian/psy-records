@@ -94,23 +94,34 @@ class ChangePasswordDialog(QDialog):
         # Connect Enter key
         self.confirm_password.returnPressed.connect(self.change_password)
         
-        # Apply stylesheet
+        # Apply enhanced stylesheet with better visibility
         self.setStyleSheet("""
             QDialog {
-                background-color: #ecf0f1;
+                background-color: #f8f9fa;
+                color: #212529;
             }
             QLineEdit {
-                padding: 8px;
-                border: 2px solid #bdc3c7;
-                border-radius: 4px;
-                font-size: 12px;
+                padding: 10px 12px;
+                border: 2px solid #6c757d;
+                border-radius: 6px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
             }
             QLineEdit:focus {
-                border-color: #3498db;
+                border-color: #0d6efd;
+                background-color: #ffffff;
+            }
+            QLineEdit::placeholder {
+                color: #6c757d;
+                font-style: italic;
             }
             QLabel {
-                font-weight: bold;
-                color: #2c3e50;
+                font-weight: 600;
+                color: #495057;
+                font-size: 12px;
             }
         """)
     

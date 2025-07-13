@@ -59,15 +59,22 @@ class LoginDialog(QDialog):
         login_button.clicked.connect(self.login)
         login_button.setStyleSheet("""
             QPushButton {
-                background-color: #3498db;
+                background-color: #198754;
                 color: white;
                 border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-weight: bold;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-height: 20px;
             }
             QPushButton:hover {
-                background-color: #2980b9;
+                background-color: #157347;
+                transform: translateY(-1px);
+            }
+            QPushButton:pressed {
+                background-color: #146c43;
+                transform: translateY(0px);
             }
         """)
         
@@ -107,15 +114,22 @@ class LoginDialog(QDialog):
         setup_button.clicked.connect(self.setup_database)
         setup_button.setStyleSheet("""
             QPushButton {
-                background-color: #27ae60;
+                background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-weight: bold;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-height: 20px;
             }
             QPushButton:hover {
-                background-color: #229954;
+                background-color: #0b5ed7;
+                transform: translateY(-1px);
+            }
+            QPushButton:pressed {
+                background-color: #0a58ca;
+                transform: translateY(0px);
             }
         """)
         
@@ -139,36 +153,59 @@ class LoginDialog(QDialog):
         self.password_input.returnPressed.connect(self.login)
         self.db_password_input.returnPressed.connect(self.login)
         
-        # Apply stylesheet
+        # Apply enhanced stylesheet with better visibility
         self.setStyleSheet("""
             QDialog {
-                background-color: #ecf0f1;
+                background-color: #f8f9fa;
+                color: #212529;
             }
             QLineEdit {
-                padding: 8px;
-                border: 2px solid #bdc3c7;
-                border-radius: 4px;
-                font-size: 12px;
+                padding: 10px 12px;
+                border: 2px solid #6c757d;
+                border-radius: 6px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
             }
             QLineEdit:focus {
-                border-color: #3498db;
+                border-color: #0d6efd;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            }
+            QLineEdit::placeholder {
+                color: #6c757d;
+                font-style: italic;
             }
             QLabel {
-                font-weight: bold;
-                color: #2c3e50;
+                font-weight: 600;
+                color: #495057;
+                font-size: 12px;
             }
             QTabWidget::pane {
-                border: 1px solid #bdc3c7;
+                border: 2px solid #dee2e6;
                 background-color: white;
+                border-radius: 6px;
             }
             QTabBar::tab {
-                background-color: #ecf0f1;
-                padding: 8px 16px;
+                background-color: #e9ecef;
+                padding: 10px 20px;
                 margin-right: 2px;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                color: #495057;
+                font-weight: 500;
             }
             QTabBar::tab:selected {
                 background-color: white;
-                border-bottom: 2px solid #3498db;
+                border-bottom: 3px solid #0d6efd;
+                color: #0d6efd;
+                font-weight: 600;
+            }
+            QTabBar::tab:hover {
+                background-color: #f8f9fa;
+                color: #0d6efd;
             }
         """)
     

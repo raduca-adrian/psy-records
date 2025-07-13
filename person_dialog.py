@@ -103,23 +103,63 @@ class PersonDialog(QDialog):
         # Connect Enter key
         self.cnp_input.returnPressed.connect(self.save_person)
         
-        # Apply stylesheet
+        # Apply enhanced stylesheet for better visibility
         self.setStyleSheet("""
             QDialog {
-                background-color: #ecf0f1;
+                background-color: #f8f9fa;
+                color: #212529;
+                font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLineEdit {
-                padding: 8px;
-                border: 2px solid #bdc3c7;
-                border-radius: 4px;
-                font-size: 12px;
+                padding: 10px 12px;
+                border: 2px solid #6c757d;
+                border-radius: 6px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 20px;
             }
             QLineEdit:focus {
-                border-color: #3498db;
+                border-color: #0d6efd;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+            }
+            QLineEdit::placeholder {
+                color: #6c757d;
+                font-style: italic;
             }
             QLabel {
-                font-weight: bold;
-                color: #2c3e50;
+                font-weight: 600;
+                color: #495057;
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+            QPushButton {
+                background-color: #0d6efd;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #0b5ed7;
+            }
+            QPushButton:pressed {
+                background-color: #0a58ca;
+            }
+            QPushButton[text="Cancel"] {
+                background-color: #6c757d;
+            }
+            QPushButton[text="Cancel"]:hover {
+                background-color: #5c636a;
+            }
+            QPushButton[text="Cancel"]:pressed {
+                background-color: #565e64;
             }
         """)
     
