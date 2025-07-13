@@ -167,11 +167,42 @@ class ConsultationDialog(QDialog):
                 border-bottom-right-radius: 6px;
                 background-color: #e9ecef;
             }
+            QComboBox::down-arrow {
+                image: none;
+                border: 2px solid #495057;
+                width: 6px;
+                height: 6px;
+                border-top: none;
+                border-right: none;
+                transform: rotate(45deg);
+                margin-top: -3px;
+            }
             QComboBox QAbstractItemView {
-                border: 1px solid #dee2e6;
+                border: 2px solid #0d6efd;
                 background-color: white;
+                color: #212529;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                font-size: 13px;
+                padding: 4px;
+                outline: none;
+                font-weight: 500;
+            }
+            QComboBox QAbstractItemView::item {
+                padding: 8px 12px;
+                color: #212529;
+                background-color: white;
+                border: none;
+                min-height: 20px;
+            }
+            QComboBox QAbstractItemView::item:selected {
+                background-color: #0d6efd;
+                color: white;
+                font-weight: 600;
+            }
+            QComboBox QAbstractItemView::item:hover {
+                background-color: #e3f2fd;
+                color: #1976d2;
             }
             QPushButton {
                 background-color: #0d6efd;

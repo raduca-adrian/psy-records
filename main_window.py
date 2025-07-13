@@ -423,6 +423,74 @@ class MainWindow(QMainWindow):
                 color: #6c757d;
                 font-style: italic;
             }
+            QComboBox {
+                padding: 10px 12px;
+                border: 2px solid #6c757d;
+                border-radius: 6px;
+                font-size: 13px;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 20px;
+                font-weight: 500;
+            }
+            QComboBox:focus {
+                border-color: #0d6efd;
+                background-color: #ffffff;
+            }
+            QComboBox::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 25px;
+                border-left: 2px solid #6c757d;
+                border-top-right-radius: 6px;
+                border-bottom-right-radius: 6px;
+                background-color: #e9ecef;
+            }
+            QComboBox::drop-down:hover {
+                background-color: #dee2e6;
+            }
+            QComboBox::down-arrow {
+                image: none;
+                border: 2px solid #495057;
+                width: 6px;
+                height: 6px;
+                border-top: none;
+                border-right: none;
+                transform: rotate(45deg);
+                margin-top: -3px;
+            }
+            QComboBox QAbstractItemView {
+                border: 2px solid #0d6efd;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                font-size: 13px;
+                padding: 4px;
+                outline: none;
+                font-weight: 500;
+                min-width: 150px;
+            }
+            QComboBox QAbstractItemView::item {
+                padding: 10px 12px;
+                color: #212529;
+                background-color: white;
+                border: none;
+                min-height: 25px;
+                font-weight: 500;
+            }
+            QComboBox QAbstractItemView::item:selected {
+                background-color: #0d6efd;
+                color: white;
+                font-weight: 600;
+            }
+            QComboBox QAbstractItemView::item:hover {
+                background-color: #e3f2fd;
+                color: #1976d2;
+                font-weight: 600;
+            }
             QTableWidget {
                 background-color: white;
                 alternate-background-color: #f8f9fa;
