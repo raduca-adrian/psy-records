@@ -34,7 +34,8 @@
     "db_creation_failed": "Eșuarea creării bazei de date. Baza de date poate exista deja.",
     "db_connect_failed": "Eșuarea conectării la baza de date nou creată.",
     "user_creation_success": "Baza de date și utilizatorul au fost create cu succes! Acum vă puteți autentifica.",
-    "user_creation_failed": "Eșuarea creării utilizatorului."
+    "user_creation_failed": "Eșuarea creării utilizatorului.",
+    "error": "Eroare"
   },
   "main_window": {
     "title": "PersonDB - Manager Bază de Date Securizată",

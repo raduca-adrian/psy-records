@@ -331,28 +331,67 @@ class LoginDialog(QDialog):
     
     def update_ui_texts(self):
         """Update all UI text elements with current language."""
+        # Update window title and main label
         self.setWindowTitle(self.get_text("window_title"))
-        self.title_label.setText(self.get_text("title"))
         
-        # Update placeholders
-        self.db_password_input.setPlaceholderText(self.get_text("db_password_placeholder"))
-        self.username_input.setPlaceholderText(self.get_text("username_placeholder"))
-        self.password_input.setPlaceholderText(self.get_text("password_placeholder"))
+        try:
+            self.title_label.setText(self.get_text("title"))
+        except (AttributeError, RuntimeError):
+            pass
         
-        # Update setup placeholders
-        self.setup_db_password.setPlaceholderText(self.get_text("create_db_password_placeholder"))
+        # Update login form placeholders with error handling
+        try:
+            self.db_password_input.setPlaceholderText(self.get_text("db_password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.username_input.setPlaceholderText(self.get_text("username_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.password_input.setPlaceholderText(self.get_text("password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
         
-        # Update buttons
-        if hasattr(self, 'login_button'):
+        # Update setup form placeholders with error handling
+        try:
+            self.setup_db_password.setPlaceholderText(self.get_text("create_db_password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.setup_db_password_confirm.setPlaceholderText(self.get_text("confirm_db_password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.setup_username.setPlaceholderText(self.get_text("create_username_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.setup_password.setPlaceholderText(self.get_text("create_password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        try:
+            self.setup_password_confirm.setPlaceholderText(self.get_text("confirm_password_placeholder"))
+        except (AttributeError, RuntimeError):
+            pass
+        
+        # Update buttons with error handling
+        try:
             self.login_button.setText(self.get_text("login_button"))
-        if hasattr(self, 'setup_button'):
+        except (AttributeError, RuntimeError):
+            pass
+        try:
             self.setup_button.setText(self.get_text("setup_button"))
+        except (AttributeError, RuntimeError):
+            pass
         
-        # Update tab labels
-        if hasattr(self, 'tab_widget'):
+        # Update tab labels with error handling
+        try:
             self.tab_widget.setTabText(0, self.get_text("login_tab"))
             if self.tab_widget.count() > 1:
                 self.tab_widget.setTabText(1, self.get_text("setup_tab"))
+        except (AttributeError, RuntimeError):
+            pass
     
     def login(self):
         db_password = self.db_password_input.text().strip()
@@ -360,12 +399,14 @@ class LoginDialog(QDialog):
         password = self.password_input.text().strip()
         
         if not all([db_password, username, password]):
-            QMessageBox.warning(self, "Error", self.get_text("fill_all_fields"))
+            QMessageBox.warning(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
+                              self.get_text("fill_all_fields"))
             return
         
         # Try to connect to database
         if not self.db_manager.connect(db_password):
-            QMessageBox.critical(self, "Error", self.get_text("invalid_db_password"))
+            QMessageBox.critical(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
+                               self.get_text("invalid_db_password"))
             return
         
         # Authenticate user
@@ -374,6 +415,8 @@ class LoginDialog(QDialog):
             self.login_successful.emit(username)
             self.accept()
         else:
+            QMessageBox.critical(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
+                               self.get_text("invalid_credentials"))
             QMessageBox.critical(self, "Error", self.get_text("invalid_credentials"))
             self.db_manager.close()
     
