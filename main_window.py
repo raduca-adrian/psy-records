@@ -206,9 +206,36 @@ class MainWindow(QMainWindow):
             }
         """)
         
+        self.medical_records_button = QPushButton("📋 Medical Records")
+        self.medical_records_button.clicked.connect(self.open_medical_records)
+        self.medical_records_button.setEnabled(False)
+        self.medical_records_button.setStyleSheet("""
+            QPushButton {
+                background-color: #6f42c1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 120px;
+            }
+            QPushButton:hover {
+                background-color: #5a359a;
+            }
+            QPushButton:pressed {
+                background-color: #4c2d83;
+            }
+            QPushButton:disabled {
+                background-color: #6c757d;
+                color: #adb5bd;
+            }
+        """)
+        
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.edit_button)
         button_layout.addWidget(self.delete_button)
+        button_layout.addWidget(self.medical_records_button)
         button_layout.addStretch()
         button_layout.addWidget(self.refresh_button)
         
@@ -485,6 +512,7 @@ class MainWindow(QMainWindow):
         has_selection = len(self.table.selectedItems()) > 0
         self.edit_button.setEnabled(has_selection)
         self.delete_button.setEnabled(has_selection)
+        self.medical_records_button.setEnabled(has_selection)
     
     def get_selected_person(self):
         """Get the currently selected person data"""
@@ -538,6 +566,19 @@ class MainWindow(QMainWindow):
         """Open dialog to change password"""
         dialog = ChangePasswordDialog(self.db_manager, self.username)
         dialog.exec()
+    
+    def open_medical_records(self):
+        """Open medical records window for selected person"""
+        person_data = self.get_selected_person()
+        if person_data:
+            # Import here to avoid circular imports
+            from medical_records_window import MedicalRecordsWindow
+            
+            # Create and show medical records window
+            records_window = MedicalRecordsWindow(person_data, self.db_manager, self)
+            records_window.show()
+        else:
+            QMessageBox.warning(self, "Warning", "Please select a person to view medical records.")
     
     def closeEvent(self, event):
         """Handle application close event"""
