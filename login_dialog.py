@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon, QFont
 from database import DatabaseManager
+from src.utils.app_translator import get_text, set_language, get_available_locales
 import os
 import json
 
@@ -15,65 +16,37 @@ class LoginDialog(QDialog):
         super().__init__()
         self.db_manager = DatabaseManager()
         self.current_user = None
-        self.current_language = "English"
-        
-        # Language dictionaries
-        self.texts = {
-            "English": {
-                "title": "Psychological Records Application",
-                "window_title": "Psychological Records - Login",
-                "db_password": "Database Password",
-                "username": "Username",
-                "password": "Password",
-                "login_button": "Login",
-                "setup_button": "Create Database & User",
-                "login_tab": "Login",
-                "setup_tab": "Initial Setup",
-                "db_password_placeholder": "Enter database password",
-                "username_placeholder": "Enter username",
-                "password_placeholder": "Enter password",
-                "create_db_password_placeholder": "Create database password",
-                "confirm_db_password": "Confirm DB Password",
-                "user_password": "User Password",
-                "confirm_password": "Confirm Password",
-                "fill_all_fields": "Please fill in all fields.",
-                "passwords_no_match": "Database passwords do not match.",
-                "user_passwords_no_match": "User passwords do not match.",
-                "password_too_short": "Password must be at least 6 characters long.",
-                "invalid_db_password": "Invalid database password or database is corrupted.",
-                "invalid_credentials": "Invalid username or password.",
-                "user_creation_success": "Database and user created successfully! You can now login.",
-                "user_creation_failed": "Failed to create user."
-            },
-            "Română": {
-                "title": "Aplicația de Înregistrări Psihologice",
-                "window_title": "Înregistrări Psihologice - Autentificare",
-                "db_password": "Parola Bazei de Date",
-                "username": "Nume Utilizator",
-                "password": "Parola",
-                "login_button": "Autentificare",
-                "setup_button": "Creează Baza de Date și Utilizator",
-                "login_tab": "Autentificare",
-                "setup_tab": "Configurare Inițială",
-                "db_password_placeholder": "Introduceți parola bazei de date",
-                "username_placeholder": "Introduceți numele de utilizator",
-                "password_placeholder": "Introduceți parola",
-                "create_db_password_placeholder": "Creați parola bazei de date",
-                "confirm_db_password": "Confirmați Parola BD",
-                "user_password": "Parola Utilizator",
-                "confirm_password": "Confirmați Parola",
-                "fill_all_fields": "Vă rugăm să completați toate câmpurile.",
-                "passwords_no_match": "Parolele bazei de date nu se potrivesc.",
-                "user_passwords_no_match": "Parolele utilizatorului nu se potrivesc.",
-                "password_too_short": "Parola trebuie să aibă cel puțin 6 caractere.",
-                "invalid_db_password": "Parola bazei de date este invalidă sau baza de date este coruptă.",
-                "invalid_credentials": "Nume de utilizator sau parolă invalidă.",
-                "user_creation_success": "Baza de date și utilizatorul au fost create cu succes! Acum vă puteți autentifica.",
-                "user_creation_failed": "Eșuarea creării utilizatorului."
-            }
-        }
-        
+        self.load_saved_language()
         self.init_ui()
+    
+    def load_saved_language(self):
+        """Load saved language preference."""
+        try:
+            if os.path.exists('settings.json'):
+                with open('settings.json', 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+                    saved_locale = settings.get('language', 'en')
+                    set_language(saved_locale)
+        except Exception:
+            set_language('en')  # Default to English
+    
+    def save_language_preference(self, locale):
+        """Save language preference to settings file."""
+        try:
+            settings = {}
+            if os.path.exists('settings.json'):
+                with open('settings.json', 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+            
+            settings['language'] = locale
+            with open('settings.json', 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Failed to save language preference: {e}")
+    
+    def get_text(self, key):
+        """Get translated text."""
+        return get_text(key, key)
     
     def init_ui(self):
         self.setWindowTitle("Psychological Records - Login / Înregistrări Psihologice - Autentificare")
@@ -89,9 +62,17 @@ class LoginDialog(QDialog):
         lang_label.setStyleSheet("font-weight: 600; color: #495057; font-size: 12px;")
         
         self.language_combo = QComboBox()
-        self.language_combo.addItems(["English", "Română"])
-        self.language_combo.setCurrentText("English")
-        self.language_combo.currentTextChanged.connect(self.change_language)
+        self.language_combo.addItem("English", "en")
+        self.language_combo.addItem("Română", "ro")
+        
+        # Set current language based on saved preference
+        current_locale = get_translator().locale
+        for i in range(self.language_combo.count()):
+            if self.language_combo.itemData(i) == current_locale:
+                self.language_combo.setCurrentIndex(i)
+                break
+        
+        self.language_combo.currentTextChanged.connect(self.on_language_changed)
         self.language_combo.setMaximumWidth(150)
         
         lang_layout.addWidget(lang_label)
@@ -320,76 +301,76 @@ class LoginDialog(QDialog):
             }
         """)
     
-    def get_text(self, key):
-        """Get text in current language."""
-        return self.texts[self.current_language].get(key, key)
-    
-    def change_language(self, language):
-        """Change the interface language."""
-        self.current_language = language
-        self.update_ui_texts()
+    def on_language_changed(self):
+        """Handle language change from combo box."""
+        current_index = self.language_combo.currentIndex()
+        locale = self.language_combo.itemData(current_index)
+        if locale:
+            set_language(locale)
+            self.save_language_preference(locale)
+            self.update_ui_texts()
     
     def update_ui_texts(self):
         """Update all UI text elements with current language."""
         # Update window title and main label
-        self.setWindowTitle(self.get_text("window_title"))
+        self.setWindowTitle(self.get_text("login.title"))
         
         try:
-            self.title_label.setText(self.get_text("title"))
+            self.title_label.setText(self.get_text("app.title"))
         except (AttributeError, RuntimeError):
             pass
         
         # Update login form placeholders with error handling
         try:
-            self.db_password_input.setPlaceholderText(self.get_text("db_password_placeholder"))
+            self.db_password_input.setPlaceholderText(self.get_text("login.db_password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.username_input.setPlaceholderText(self.get_text("username_placeholder"))
+            self.username_input.setPlaceholderText(self.get_text("login.username_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.password_input.setPlaceholderText(self.get_text("password_placeholder"))
+            self.password_input.setPlaceholderText(self.get_text("login.password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         
         # Update setup form placeholders with error handling
         try:
-            self.setup_db_password.setPlaceholderText(self.get_text("create_db_password_placeholder"))
+            self.setup_db_password.setPlaceholderText(self.get_text("login.create_db_password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.setup_db_password_confirm.setPlaceholderText(self.get_text("confirm_db_password_placeholder"))
+            self.setup_db_password_confirm.setPlaceholderText(self.get_text("login.confirm_db_password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.setup_username.setPlaceholderText(self.get_text("create_username_placeholder"))
+            self.setup_username.setPlaceholderText(self.get_text("login.create_username_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.setup_password.setPlaceholderText(self.get_text("create_password_placeholder"))
+            self.setup_password.setPlaceholderText(self.get_text("login.create_password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.setup_password_confirm.setPlaceholderText(self.get_text("confirm_password_placeholder"))
+            self.setup_password_confirm.setPlaceholderText(self.get_text("login.confirm_password_placeholder"))
         except (AttributeError, RuntimeError):
             pass
         
         # Update buttons with error handling
         try:
-            self.login_button.setText(self.get_text("login_button"))
+            self.login_button.setText(self.get_text("login.login_button"))
         except (AttributeError, RuntimeError):
             pass
         try:
-            self.setup_button.setText(self.get_text("setup_button"))
+            self.setup_button.setText(self.get_text("login.setup_button"))
         except (AttributeError, RuntimeError):
             pass
         
         # Update tab labels with error handling
         try:
-            self.tab_widget.setTabText(0, self.get_text("login_tab"))
+            self.tab_widget.setTabText(0, self.get_text("login.login_tab"))
             if self.tab_widget.count() > 1:
-                self.tab_widget.setTabText(1, self.get_text("setup_tab"))
+                self.tab_widget.setTabText(1, self.get_text("login.setup_tab"))
         except (AttributeError, RuntimeError):
             pass
     
@@ -399,14 +380,14 @@ class LoginDialog(QDialog):
         password = self.password_input.text().strip()
         
         if not all([db_password, username, password]):
-            QMessageBox.warning(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
-                              self.get_text("fill_all_fields"))
+            QMessageBox.warning(self, self.get_text("login.error"), 
+                              self.get_text("login.fill_all_fields"))
             return
         
         # Try to connect to database
         if not self.db_manager.connect(db_password):
-            QMessageBox.critical(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
-                               self.get_text("invalid_db_password"))
+            QMessageBox.critical(self, self.get_text("login.error"), 
+                               self.get_text("login.invalid_db_password"))
             return
         
         # Authenticate user
@@ -415,9 +396,8 @@ class LoginDialog(QDialog):
             self.login_successful.emit(username)
             self.accept()
         else:
-            QMessageBox.critical(self, self.get_text("error") if "error" in self.texts[self.current_language] else "Error", 
-                               self.get_text("invalid_credentials"))
-            QMessageBox.critical(self, "Error", self.get_text("invalid_credentials"))
+            QMessageBox.critical(self, self.get_text("login.error"), 
+                               self.get_text("login.invalid_credentials"))
             self.db_manager.close()
     
     def setup_database(self):
@@ -429,38 +409,38 @@ class LoginDialog(QDialog):
         
         # Validate inputs
         if not all([db_password, db_password_confirm, username, password, password_confirm]):
-            QMessageBox.warning(self, "Error", self.get_text("fill_all_fields"))
+            QMessageBox.warning(self, self.get_text("login.error"), self.get_text("login.fill_all_fields"))
             return
         
         if db_password != db_password_confirm:
-            QMessageBox.warning(self, "Error", self.get_text("passwords_no_match"))
+            QMessageBox.warning(self, self.get_text("login.error"), self.get_text("login.passwords_no_match"))
             return
         
         if password != password_confirm:
-            QMessageBox.warning(self, "Error", self.get_text("user_passwords_no_match"))
+            QMessageBox.warning(self, self.get_text("login.error"), self.get_text("login.user_passwords_no_match"))
             return
         
         if len(db_password) < 6:
-            QMessageBox.warning(self, "Error", self.get_text("password_too_short"))
+            QMessageBox.warning(self, self.get_text("login.error"), self.get_text("login.db_password_too_short"))
             return
         
         if len(password) < 6:
-            QMessageBox.warning(self, "Error", self.get_text("password_too_short"))
+            QMessageBox.warning(self, self.get_text("login.error"), self.get_text("login.password_too_short"))
             return
         
         # Initialize database
         if not self.db_manager.initialize_database(db_password):
-            QMessageBox.critical(self, "Error", "Failed to create database. Database may already exist.")
+            QMessageBox.critical(self, self.get_text("login.error"), self.get_text("login.db_creation_failed"))
             return
         
         # Connect to the new database
         if not self.db_manager.connect(db_password):
-            QMessageBox.critical(self, "Error", "Failed to connect to the newly created database.")
+            QMessageBox.critical(self, self.get_text("login.error"), self.get_text("login.db_connect_failed"))
             return
         
         # Create the first user
         if self.db_manager.create_user(username, password):
-            QMessageBox.information(self, "Success", self.get_text("user_creation_success"))
+            QMessageBox.information(self, self.get_text("common.success"), self.get_text("login.user_creation_success"))
             # Switch to login tab
             tab_widget = self.findChild(QTabWidget)
             if tab_widget:
@@ -472,7 +452,7 @@ class LoginDialog(QDialog):
                 self.setup_password.clear()
                 self.setup_password_confirm.clear()
         else:
-            QMessageBox.critical(self, "Error", self.get_text("user_creation_failed"))
+            QMessageBox.critical(self, self.get_text("login.error"), self.get_text("login.user_creation_failed"))
         
         self.db_manager.close()
     
