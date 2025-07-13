@@ -5,8 +5,9 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
                             QMenu, QStatusBar, QToolBar, QLineEdit, QDialog)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon, QFont
-from person_dialog import PersonDialog
-from change_password_dialog import ChangePasswordDialog
+from .person_dialog import PersonDialog
+from .change_password_dialog import ChangePasswordDialog
+from ..utils.translator import _
 from datetime import datetime
 
 class MainWindow(QMainWindow):
@@ -23,7 +24,7 @@ class MainWindow(QMainWindow):
         self.refresh_timer.start(30000)  # Refresh every 30 seconds
     
     def init_ui(self):
-        self.setWindowTitle(f"Secure Database Application - Welcome, {self.username}")
+        self.setWindowTitle(f"{_('main_window.title')} - {_('main_window.logged_in_as')}: {self.username}")
         self.setGeometry(100, 100, 800, 600)
         
         # Create central widget
@@ -36,7 +37,7 @@ class MainWindow(QMainWindow):
         # Header with enhanced styling
         header_layout = QHBoxLayout()
         
-        title_label = QLabel("PersonDB - Secure Database Manager")
+        title_label = QLabel(_('main_window.title'))
         title_font = QFont()
         title_font.setPointSize(22)
         title_font.setBold(True)
@@ -56,7 +57,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        user_label = QLabel(f"👤 Logged in as: {self.username}")
+        user_label = QLabel(f"👤 {_('main_window.logged_in_as')}: {self.username}")
         user_label.setStyleSheet("""
             QLabel {
                 color: #000000;
@@ -78,7 +79,7 @@ class MainWindow(QMainWindow):
         
         # Search bar with enhanced styling
         search_layout = QHBoxLayout()
-        search_label = QLabel("🔍 Search:")
+        search_label = QLabel(f"🔍 {_('main_window.search')}:")
         search_label.setStyleSheet("""
             QLabel {
                 color: #000000;
@@ -94,7 +95,7 @@ class MainWindow(QMainWindow):
         """)
         
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Search by name or CNP...")
+        self.search_input.setPlaceholderText(_('main_window.search_placeholder'))
         self.search_input.textChanged.connect(self.filter_table)
         self.search_input.setMaximumWidth(400)
         self.search_input.setMinimumHeight(40)

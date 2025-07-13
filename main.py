@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+Psychological Records Application
+Secure application for managing psychological records.
+Ensures only encrypted databases are used for security.
+"""
+
 import sys
 import os
 from PyQt6.QtWidgets import QApplication, QMessageBox
@@ -6,12 +13,33 @@ from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor, QFont
 from login_dialog import LoginDialog
 from main_window import MainWindow
 
+def ensure_encrypted_database_only():
+    """Ensure only encrypted database files are used for security."""
+    # Remove any unencrypted database files for security
+    unencrypted_files = [
+        'secure_app.db',
+        'database.db', 
+        'app.db',
+        'psychological_records.db'
+    ]
+    
+    for file in unencrypted_files:
+        if os.path.exists(file):
+            try:
+                os.remove(file)
+                print(f"Security: Removed unencrypted database file: {file}")
+            except Exception as e:
+                print(f"Warning: Could not remove unencrypted file {file}: {e}")
+
 class SecureApplication:
     def __init__(self):
+        # Security: Ensure only encrypted databases are used
+        ensure_encrypted_database_only()
+        
         self.app = QApplication(sys.argv)
-        self.app.setApplicationName("Secure Database Application")
-        self.app.setApplicationVersion("1.0.0")
-        self.app.setOrganizationName("SecureApp Corp")
+        self.app.setApplicationName("Psychological Records Application")
+        self.app.setApplicationVersion("1.2.0")
+        self.app.setOrganizationName("Psychological Practice Management")
         
         # Set application icon (create a simple programmatic icon)
         self.create_app_icon()

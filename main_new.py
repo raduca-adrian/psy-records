@@ -15,9 +15,16 @@ from PyQt6.QtGui import QIcon
 # Add src directory to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from src.utils.translator import set_locale, _
-from src.ui.login_dialog import LoginDialog
-from src.ui.main_window import MainWindow
+try:
+    from utils.translator import set_locale, _
+    from ui.login_dialog import LoginDialog
+    from ui.main_window import MainWindow
+except ImportError as e:
+    print(f"Import error: {e}")
+    print("Falling back to original structure...")
+    # Fallback to original imports
+    from login_dialog import LoginDialog
+    from main_window import MainWindow
 
 
 class PsychologicalRecordsApp:
