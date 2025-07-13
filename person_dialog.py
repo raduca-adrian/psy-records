@@ -116,22 +116,24 @@ class PersonDialog(QDialog):
                 border-radius: 6px;
                 font-size: 13px;
                 background-color: white;
-                color: #212529;
+                color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
                 min-height: 20px;
+                font-weight: 600;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
             }
             QLineEdit::placeholder {
-                color: #6c757d;
+                color: #495057;
                 font-style: italic;
+                font-weight: 500;
             }
             QLabel {
-                font-weight: 600;
-                color: #495057;
+                font-weight: 700;
+                color: #000000;
                 font-size: 12px;
                 margin-bottom: 4px;
             }

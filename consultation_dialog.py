@@ -19,7 +19,7 @@ class ConsultationDialog(QDialog):
             self.populate_fields()
     
     def init_ui(self):
-        self.setWindowTitle(f"{'Edit' if self.is_edit_mode else 'New'} Consultation - {self.person_name}")
+        self.setWindowTitle(f"{'Edit' if self.is_edit_mode else 'New'} Therapy Session - {self.person_name}")
         self.setModal(True)
         self.resize(800, 600)
         
@@ -32,7 +32,7 @@ class ConsultationDialog(QDialog):
         scroll_layout = QVBoxLayout(scroll_widget)
         
         # Header
-        header_label = QLabel(f"{'Edit' if self.is_edit_mode else 'New'} Consultation")
+        header_label = QLabel(f"{'Edit' if self.is_edit_mode else 'New'} Therapy Session")
         header_font = QFont()
         header_font.setPointSize(16)
         header_font.setBold(True)
@@ -40,64 +40,64 @@ class ConsultationDialog(QDialog):
         header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         scroll_layout.addWidget(header_label)
         
-        patient_label = QLabel(f"Patient: {self.person_name}")
+        patient_label = QLabel(f"Client: {self.person_name}")
         patient_label.setStyleSheet("color: #6c757d; font-weight: 500; margin: 10px 0;")
         scroll_layout.addWidget(patient_label)
         
         # Form layout
         form_layout = QFormLayout()
         
-        # Consultation Date
+        # Session Date
         self.date_edit = QDateEdit()
         self.date_edit.setDate(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
-        form_layout.addRow("Consultation Date:", self.date_edit)
+        form_layout.addRow("Session Date:", self.date_edit)
         
-        # Consultation Type
+        # Session Type
         self.consultation_type_combo = QComboBox()
         self.consultation_type_combo.addItems([
-            "Follow-up",
-            "Initial Consultation", 
-            "Emergency Visit",
-            "Routine Check-up",
-            "Specialist Referral",
-            "Test Results Review",
-            "Medication Review",
-            "Other"
+            "Individual Therapy",
+            "Initial Intake", 
+            "Crisis Intervention",
+            "Group Therapy",
+            "Family Therapy",
+            "Couples Therapy",
+            "Assessment Session",
+            "Termination Session"
         ])
-        form_layout.addRow("Consultation Type:", self.consultation_type_combo)
+        form_layout.addRow("Session Type:", self.consultation_type_combo)
         
-        # Symptoms
+        # Session Focus/Issues
         self.symptoms_edit = QTextEdit()
         self.symptoms_edit.setMaximumHeight(100)
-        self.symptoms_edit.setPlaceholderText("Current symptoms and complaints...")
-        form_layout.addRow("Symptoms:", self.symptoms_edit)
+        self.symptoms_edit.setPlaceholderText("Main issues discussed, presenting concerns...")
+        form_layout.addRow("Session Focus:", self.symptoms_edit)
         
-        # Examination Findings
+        # Clinical Observations
         self.examination_findings_edit = QTextEdit()
         self.examination_findings_edit.setMaximumHeight(120)
-        self.examination_findings_edit.setPlaceholderText("Clinical examination findings, vital signs...")
-        form_layout.addRow("Examination Findings:", self.examination_findings_edit)
+        self.examination_findings_edit.setPlaceholderText("Mood, affect, behavior, cognitive functioning, progress...")
+        form_layout.addRow("Clinical Observations:", self.examination_findings_edit)
         
-        # Recommendations
+        # Interventions Used
         self.recommendations_edit = QTextEdit()
         self.recommendations_edit.setMaximumHeight(100)
-        self.recommendations_edit.setPlaceholderText("Treatment recommendations and advice...")
-        form_layout.addRow("Recommendations:", self.recommendations_edit)
+        self.recommendations_edit.setPlaceholderText("Therapeutic techniques, interventions, homework assigned...")
+        form_layout.addRow("Interventions Used:", self.recommendations_edit)
         
-        # Medications
+        # Response & Progress
         self.medications_edit = QTextEdit()
         self.medications_edit.setMaximumHeight(100)
-        self.medications_edit.setPlaceholderText("Prescribed medications, dosage, instructions...")
-        form_layout.addRow("Medications:", self.medications_edit)
+        self.medications_edit.setPlaceholderText("Client response, progress toward goals, compliance...")
+        form_layout.addRow("Response & Progress:", self.medications_edit)
         
-        # Next Appointment
+        # Next Session
         self.next_appointment_edit = QDateEdit()
-        self.next_appointment_edit.setDate(QDate.currentDate().addDays(30))
+        self.next_appointment_edit.setDate(QDate.currentDate().addDays(7))
         self.next_appointment_edit.setCalendarPopup(True)
         self.next_appointment_edit.setSpecialValueText("Not scheduled")
         self.next_appointment_edit.setMinimumDate(QDate(1900, 1, 1))
-        form_layout.addRow("Next Appointment:", self.next_appointment_edit)
+        form_layout.addRow("Next Session:", self.next_appointment_edit)
         
         # Notes
         self.notes_edit = QTextEdit()
@@ -110,7 +110,7 @@ class ConsultationDialog(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
         
-        self.save_button = QPushButton("Save Consultation")
+        self.save_button = QPushButton("Save Session Notes")
         self.save_button.clicked.connect(self.save_consultation)
         
         self.cancel_button = QPushButton("Cancel")
@@ -135,8 +135,8 @@ class ConsultationDialog(QDialog):
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLabel {
-                font-weight: 600;
-                color: #495057;
+                font-weight: 700;
+                color: #000000;
                 font-size: 12px;
                 margin-bottom: 4px;
             }
@@ -146,9 +146,10 @@ class ConsultationDialog(QDialog):
                 border-radius: 6px;
                 font-size: 13px;
                 background-color: white;
-                color: #212529;
+                color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                font-weight: 600;
             }
             QLineEdit:focus, QTextEdit:focus, QDateEdit:focus, QComboBox:focus {
                 border-color: #0d6efd;
@@ -190,19 +191,21 @@ class ConsultationDialog(QDialog):
             }
             QComboBox QAbstractItemView::item {
                 padding: 8px 12px;
-                color: #212529;
+                color: #000000;
                 background-color: white;
                 border: none;
                 min-height: 20px;
+                font-weight: 600;
             }
             QComboBox QAbstractItemView::item:selected {
                 background-color: #0d6efd;
                 color: white;
-                font-weight: 600;
+                font-weight: 700;
             }
             QComboBox QAbstractItemView::item:hover {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background-color: #cce7ff;
+                color: #000000;
+                font-weight: 700;
             }
             QPushButton {
                 background-color: #0d6efd;

@@ -18,7 +18,7 @@ class LoginDialog(QDialog):
         
     def init_ui(self):
         self.setWindowTitle("Secure Application - Login")
-        self.setFixedSize(400, 300)
+        self.setFixedSize(600, 500)
         self.setModal(True)
         
         # Create main layout
@@ -27,11 +27,18 @@ class LoginDialog(QDialog):
         # Title
         title_label = QLabel("Secure Database Application")
         title_font = QFont()
-        title_font.setPointSize(16)
+        title_font.setPointSize(20)
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("color: #2c3e50; margin: 20px;")
+        title_label.setStyleSheet("""
+            color: #2c3e50; 
+            margin: 25px; 
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: 10px;
+            border: 2px solid #0d6efd;
+        """)
         
         # Create tab widget
         tab_widget = QTabWidget()
@@ -39,6 +46,8 @@ class LoginDialog(QDialog):
         # Login tab
         login_tab = QWidget()
         login_layout = QFormLayout()
+        login_layout.setSpacing(20)
+        login_layout.setContentsMargins(30, 20, 30, 20)
         
         self.db_password_input = QLineEdit()
         self.db_password_input.setEchoMode(QLineEdit.EchoMode.Password)
@@ -62,17 +71,23 @@ class LoginDialog(QDialog):
                 background-color: #198754;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-height: 20px;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 16px;
+                min-height: 30px;
+                min-width: 150px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
             }
             QPushButton:hover {
                 background-color: #157347;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
             }
             QPushButton:pressed {
                 background-color: #146c43;
+                transform: translateY(0px);
             }
         """)
         
@@ -82,6 +97,8 @@ class LoginDialog(QDialog):
         # Setup tab
         setup_tab = QWidget()
         setup_layout = QFormLayout()
+        setup_layout.setSpacing(20)
+        setup_layout.setContentsMargins(30, 20, 30, 20)
         
         self.setup_db_password = QLineEdit()
         self.setup_db_password.setEchoMode(QLineEdit.EchoMode.Password)
@@ -115,17 +132,23 @@ class LoginDialog(QDialog):
                 background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-height: 20px;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 16px;
+                min-height: 30px;
+                min-width: 200px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
             }
             QPushButton:hover {
                 background-color: #0b5ed7;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
             }
             QPushButton:pressed {
                 background-color: #0a58ca;
+                transform: translateY(0px);
             }
         """)
         
@@ -154,53 +177,70 @@ class LoginDialog(QDialog):
             QDialog {
                 background-color: #f8f9fa;
                 color: #212529;
+                font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLineEdit {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 10px;
+                font-size: 16px;
                 background-color: white;
                 color: #212529;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                min-height: 25px;
+                font-weight: 500;
+                margin: 5px 0px;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #6c757d;
                 font-style: italic;
+                font-weight: 400;
             }
             QLabel {
-                font-weight: 600;
+                font-weight: 700;
                 color: #495057;
-                font-size: 12px;
+                font-size: 15px;
+                padding: 8px 0px;
+                margin: 5px 0px;
             }
             QTabWidget::pane {
-                border: 2px solid #dee2e6;
+                border: 3px solid #dee2e6;
                 background-color: white;
-                border-radius: 6px;
+                border-radius: 10px;
+                margin-top: 10px;
+                padding: 15px;
             }
             QTabBar::tab {
                 background-color: #e9ecef;
-                padding: 10px 20px;
-                margin-right: 2px;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
+                padding: 15px 30px;
+                margin-right: 5px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
                 color: #495057;
-                font-weight: 500;
+                font-weight: 600;
+                font-size: 14px;
+                min-width: 120px;
             }
             QTabBar::tab:selected {
                 background-color: white;
-                border-bottom: 3px solid #0d6efd;
+                border-bottom: 4px solid #0d6efd;
                 color: #0d6efd;
-                font-weight: 600;
+                font-weight: 700;
+                font-size: 15px;
             }
             QTabBar::tab:hover {
-                background-color: #f8f9fa;
-                color: #0d6efd;
+                background-color: #dee2e6;
+                color: #212529;
+            }
+            QFormLayout {
+                margin: 20px;
+                spacing: 15px;
             }
         """)
     

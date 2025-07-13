@@ -10,13 +10,13 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 
-class MedicalReportGenerator:
+class PsychologicalReportGenerator:
     def __init__(self):
         self.styles = getSampleStyleSheet()
         self.setup_custom_styles()
         
     def setup_custom_styles(self):
-        """Set up custom styles for the medical report."""
+        """Set up custom styles for the psychological report."""
         
         # Title style
         self.title_style = ParagraphStyle(
@@ -107,8 +107,8 @@ class MedicalReportGenerator:
         
         canvas.restoreState()
     
-    def generate_patient_report(self, person_data, assessments, consultations, output_path):
-        """Generate a comprehensive medical report for a patient."""
+    def generate_client_report(self, person_data, assessments, consultations, output_path):
+        """Generate a comprehensive psychological report for a client."""
         
         # Create the PDF document
         doc = SimpleDocTemplate(
@@ -124,23 +124,23 @@ class MedicalReportGenerator:
         story = []
         
         # Title
-        title = Paragraph("Medical Record Report", self.title_style)
+        title = Paragraph("Psychological Record Report", self.title_style)
         story.append(title)
         story.append(Spacer(1, 20))
         
-        # Patient Information Section
-        story.append(Paragraph("Patient Information", self.header_style))
+        # Client Information Section
+        story.append(Paragraph("Client Information", self.header_style))
         
-        patient_info = [
-            ["Patient Name:", person_data[1] if len(person_data) > 1 else "N/A"],
+        client_info = [
+            ["Client Name:", person_data[1] if len(person_data) > 1 else "N/A"],
             ["CNP:", person_data[2] if len(person_data) > 2 else "N/A"],
             ["Record Created:", person_data[3] if len(person_data) > 3 else "N/A"],
             ["Last Updated:", person_data[4] if len(person_data) > 4 else "N/A"],
             ["Report Date:", datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
         ]
         
-        patient_table = Table(patient_info, colWidths=[2*inch, 4*inch])
-        patient_table.setStyle(TableStyle([
+        client_table = Table(client_info, colWidths=[2*inch, 4*inch])
+        client_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (0, -1), HexColor('#ecf0f1')),
             ('TEXTCOLOR', (0, 0), (-1, -1), black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -152,12 +152,12 @@ class MedicalReportGenerator:
             ('ROWBACKGROUNDS', (0, 0), (-1, -1), [white, HexColor('#f8f9fa')])
         ]))
         
-        story.append(patient_table)
+        story.append(client_table)
         story.append(Spacer(1, 30))
         
-        # Medical Assessments Section
+        # Psychological Assessments Section
         if assessments:
-            story.append(Paragraph("Medical Assessments", self.header_style))
+            story.append(Paragraph("Psychological Assessments", self.header_style))
             
             for i, assessment in enumerate(assessments):
                 assessment_content = self._format_assessment(assessment, i + 1)
@@ -166,9 +166,9 @@ class MedicalReportGenerator:
                 if i < len(assessments) - 1:  # Add spacer between assessments
                     story.append(Spacer(1, 15))
         
-        # Consultations Section
+        # Therapy Sessions Section
         if consultations:
-            story.append(Paragraph("Consultations", self.header_style))
+            story.append(Paragraph("Therapy Sessions", self.header_style))
             
             for i, consultation in enumerate(consultations):
                 consultation_content = self._format_consultation(consultation, i + 1)
@@ -292,7 +292,7 @@ class MedicalReportGenerator:
         
         return content
 
-def generate_medical_report(person_data, assessments, consultations, output_path):
-    """Convenience function to generate a medical report."""
-    generator = MedicalReportGenerator()
-    return generator.generate_patient_report(person_data, assessments, consultations, output_path)
+def generate_psychological_report(person_data, assessments, consultations, output_path):
+    """Convenience function to generate a psychological report."""
+    generator = PsychologicalReportGenerator()
+    return generator.generate_client_report(person_data, assessments, consultations, output_path)

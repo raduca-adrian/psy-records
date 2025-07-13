@@ -32,7 +32,7 @@ class AssessmentDialog(QDialog):
         scroll_layout = QVBoxLayout(scroll_widget)
         
         # Header
-        header_label = QLabel(f"{'Edit' if self.is_edit_mode else 'New'} Medical Assessment")
+        header_label = QLabel(f"{'Edit' if self.is_edit_mode else 'New'} Psychological Assessment")
         header_font = QFont()
         header_font.setPointSize(16)
         header_font.setBold(True)
@@ -40,7 +40,7 @@ class AssessmentDialog(QDialog):
         header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         scroll_layout.addWidget(header_label)
         
-        patient_label = QLabel(f"Patient: {self.person_name}")
+        patient_label = QLabel(f"Client: {self.person_name}")
         patient_label.setStyleSheet("color: #6c757d; font-weight: 500; margin: 10px 0;")
         scroll_layout.addWidget(patient_label)
         
@@ -53,41 +53,41 @@ class AssessmentDialog(QDialog):
         self.date_edit.setCalendarPopup(True)
         form_layout.addRow("Assessment Date:", self.date_edit)
         
-        # Chief Complaint
+        # Presenting Problem
         self.chief_complaint_edit = QTextEdit()
         self.chief_complaint_edit.setMaximumHeight(80)
-        self.chief_complaint_edit.setPlaceholderText("Primary reason for visit...")
-        form_layout.addRow("Chief Complaint:", self.chief_complaint_edit)
+        self.chief_complaint_edit.setPlaceholderText("Primary presenting problem or concern...")
+        form_layout.addRow("Presenting Problem:", self.chief_complaint_edit)
         
-        # Medical History
+        # Psychological History
         self.medical_history_edit = QTextEdit()
         self.medical_history_edit.setMaximumHeight(100)
-        self.medical_history_edit.setPlaceholderText("Relevant medical history, allergies, current medications...")
-        form_layout.addRow("Medical History:", self.medical_history_edit)
+        self.medical_history_edit.setPlaceholderText("Previous therapy, mental health history, family history...")
+        form_layout.addRow("Psychological History:", self.medical_history_edit)
         
-        # Physical Examination
+        # Mental Status Exam
         self.physical_exam_edit = QTextEdit()
         self.physical_exam_edit.setMaximumHeight(120)
-        self.physical_exam_edit.setPlaceholderText("Physical examination findings, vital signs...")
-        form_layout.addRow("Physical Examination:", self.physical_exam_edit)
+        self.physical_exam_edit.setPlaceholderText("Appearance, mood, affect, thought process, cognition, insight...")
+        form_layout.addRow("Mental Status Exam:", self.physical_exam_edit)
         
-        # Diagnosis
+        # Clinical Impressions/Diagnosis
         self.diagnosis_edit = QTextEdit()
         self.diagnosis_edit.setMaximumHeight(80)
-        self.diagnosis_edit.setPlaceholderText("Primary and secondary diagnoses...")
-        form_layout.addRow("Diagnosis:", self.diagnosis_edit)
+        self.diagnosis_edit.setPlaceholderText("DSM-5 diagnoses, clinical impressions...")
+        form_layout.addRow("Clinical Impressions:", self.diagnosis_edit)
         
-        # Treatment Plan
+        # Treatment Goals & Plan
         self.treatment_plan_edit = QTextEdit()
         self.treatment_plan_edit.setMaximumHeight(120)
-        self.treatment_plan_edit.setPlaceholderText("Treatment recommendations, medications, follow-up...")
-        form_layout.addRow("Treatment Plan:", self.treatment_plan_edit)
+        self.treatment_plan_edit.setPlaceholderText("Treatment goals, therapeutic approach, frequency...")
+        form_layout.addRow("Treatment Goals & Plan:", self.treatment_plan_edit)
         
-        # Notes
+        # Risk Assessment
         self.notes_edit = QTextEdit()
         self.notes_edit.setMaximumHeight(100)
-        self.notes_edit.setPlaceholderText("Additional notes and observations...")
-        form_layout.addRow("Notes:", self.notes_edit)
+        self.notes_edit.setPlaceholderText("Suicide/self-harm risk, safety concerns, additional notes...")
+        form_layout.addRow("Risk Assessment & Notes:", self.notes_edit)
         
         scroll_layout.addLayout(form_layout)
         
@@ -119,8 +119,8 @@ class AssessmentDialog(QDialog):
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLabel {
-                font-weight: 600;
-                color: #495057;
+                font-weight: 700;
+                color: #000000;
                 font-size: 12px;
                 margin-bottom: 4px;
             }
@@ -130,9 +130,10 @@ class AssessmentDialog(QDialog):
                 border-radius: 6px;
                 font-size: 13px;
                 background-color: white;
-                color: #212529;
+                color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                font-weight: 600;
             }
             QLineEdit:focus, QTextEdit:focus, QDateEdit:focus {
                 border-color: #0d6efd;

@@ -8,7 +8,7 @@ import os
 from database import DatabaseManager
 from assessment_dialog import AssessmentDialog
 from consultation_dialog import ConsultationDialog
-from pdf_generator import generate_medical_report
+from pdf_generator import generate_psychological_report
 
 class MedicalRecordsWindow(QMainWindow):
     def __init__(self, person_data, db_manager, parent=None):
@@ -23,7 +23,7 @@ class MedicalRecordsWindow(QMainWindow):
         self.load_medical_records()
     
     def init_ui(self):
-        self.setWindowTitle(f"Medical Records - {self.person_name}")
+        self.setWindowTitle(f"Psychological Records - {self.person_name}")
         self.setGeometry(100, 100, 1200, 800)
         
         # Central widget
@@ -39,25 +39,25 @@ class MedicalRecordsWindow(QMainWindow):
         header_layout = QVBoxLayout(header_frame)
         
         # Patient info header
-        title_label = QLabel(f"Medical Records - {self.person_name}")
+        title_label = QLabel(f"Psychological Records - {self.person_name}")
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
         title_label.setFont(title_font)
         
-        info_label = QLabel(f"CNP: {self.person_cnp} | Patient ID: {self.person_id}")
+        info_label = QLabel(f"CNP: {self.person_cnp} | Client ID: {self.person_id}")
         info_label.setStyleSheet("color: #6c757d; font-size: 12px;")
         
         # Action buttons
         button_layout = QHBoxLayout()
         
-        self.add_assessment_btn = QPushButton("📋 New Assessment")
+        self.add_assessment_btn = QPushButton("📋 New Psychological Assessment")
         self.add_assessment_btn.clicked.connect(self.add_assessment)
         
-        self.add_consultation_btn = QPushButton("🩺 New Consultation")
+        self.add_consultation_btn = QPushButton("� New Therapy Session")
         self.add_consultation_btn.clicked.connect(self.add_consultation)
         
-        self.generate_report_btn = QPushButton("📄 Generate PDF Report")
+        self.generate_report_btn = QPushButton("📄 Generate Clinical Report")
         self.generate_report_btn.clicked.connect(self.generate_pdf_report)
         
         self.refresh_btn = QPushButton("🔄 Refresh")
@@ -81,12 +81,12 @@ class MedicalRecordsWindow(QMainWindow):
         # Assessments tab
         self.assessments_tab = QWidget()
         self.setup_assessments_tab()
-        self.tab_widget.addTab(self.assessments_tab, "📋 Assessments")
+        self.tab_widget.addTab(self.assessments_tab, "📋 Psychological Assessments")
         
         # Consultations tab
         self.consultations_tab = QWidget()
         self.setup_consultations_tab()
-        self.tab_widget.addTab(self.consultations_tab, "🩺 Consultations")
+        self.tab_widget.addTab(self.consultations_tab, "� Therapy Sessions")
         
         main_layout.addWidget(self.tab_widget)
         
@@ -553,18 +553,18 @@ class MedicalRecordsWindow(QMainWindow):
     def generate_pdf_report(self):
         """Generate a PDF medical report."""
         try:
-            # Get complete medical record
+            # Get complete psychological record
             record = self.db_manager.get_person_complete_record(self.person_id)
             
             if not record:
-                QMessageBox.warning(self, "No Data", "No medical records found for this patient.")
+                QMessageBox.warning(self, "No Data", "No psychological records found for this client.")
                 return
             
             # Ask user for save location
-            filename = f"Medical_Report_{self.person_name.replace(' ', '_')}_{QDate.currentDate().toString('yyyy-MM-dd')}.pdf"
+            filename = f"Psychological_Report_{self.person_name.replace(' ', '_')}_{QDate.currentDate().toString('yyyy-MM-dd')}.pdf"
             file_path, _ = QFileDialog.getSaveFileName(
                 self, 
-                "Save Medical Report", 
+                "Save Psychological Report", 
                 filename,
                 "PDF Files (*.pdf);;All Files (*)"
             )
@@ -573,7 +573,7 @@ class MedicalRecordsWindow(QMainWindow):
                 return  # User cancelled
             
             # Generate the report
-            success = generate_medical_report(
+            success = generate_psychological_report(
                 record['person'],
                 record['assessments'],
                 record['consultations'],
@@ -582,7 +582,7 @@ class MedicalRecordsWindow(QMainWindow):
             
             if success:
                 QMessageBox.information(self, "Success", 
-                                      f"Medical report generated successfully!\n\nSaved to: {file_path}")
+                                      f"Psychological report generated successfully!\n\nSaved to: {file_path}")
                 
                 # Ask if user wants to open the file
                 reply = QMessageBox.question(self, "Open Report", 
@@ -592,7 +592,7 @@ class MedicalRecordsWindow(QMainWindow):
                 if reply == QMessageBox.StandardButton.Yes:
                     os.startfile(file_path)  # Windows
             else:
-                QMessageBox.critical(self, "Error", "Failed to generate medical report.")
+                QMessageBox.critical(self, "Error", "Failed to generate psychological report.")
                 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred while generating the report:\n{str(e)}")
