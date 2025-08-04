@@ -426,20 +426,22 @@ class MainWindow(QMainWindow):
                 font-weight: 700;
             }
             QLineEdit {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 20px;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #495057;
@@ -447,28 +449,30 @@ class MainWindow(QMainWindow):
                 font-weight: 500;
             }
             QComboBox {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 20px;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
             }
             QComboBox:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QComboBox::drop-down {
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
-                width: 25px;
-                border-left: 2px solid #6c757d;
-                border-top-right-radius: 6px;
-                border-bottom-right-radius: 6px;
+                width: 32px;
+                border-left: 3px solid #6c757d;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
                 background-color: #e9ecef;
             }
             QComboBox::drop-down:hover {
@@ -476,32 +480,32 @@ class MainWindow(QMainWindow):
             }
             QComboBox::down-arrow {
                 image: none;
-                border: 2px solid #000000;
-                width: 6px;
-                height: 6px;
+                border: 3px solid #000000;
+                width: 10px;
+                height: 10px;
                 border-top: none;
                 border-right: none;
                 transform: rotate(45deg);
                 margin-top: -3px;
             }
             QComboBox QAbstractItemView {
-                border: 2px solid #0d6efd;
+                border: 3px solid #0d6efd;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                font-size: 13px;
-                padding: 4px;
+                font-size: 16px;
+                padding: 8px;
                 outline: none;
                 font-weight: 600;
-                min-width: 150px;
+                min-width: 200px;
             }
             QComboBox QAbstractItemView::item {
-                padding: 10px 12px;
+                padding: 16px 20px;
                 color: #000000;
                 background-color: white;
                 border: none;
-                min-height: 25px;
+                min-height: 35px;
                 font-weight: 600;
             }
             QComboBox QAbstractItemView::item:selected {
@@ -513,6 +517,13 @@ class MainWindow(QMainWindow):
                 background-color: #cce7ff;
                 color: #000000;
                 font-weight: 700;
+            }
+            QLabel {
+                color: #212529;
+                font-weight: 700;
+                font-size: 16px;
+                padding: 10px 4px;
+                min-height: 32px;
             }
             QTableWidget {
                 background-color: white;

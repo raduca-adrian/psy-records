@@ -237,7 +237,7 @@ class LoginDialog(QDialog):
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLineEdit {
-                padding: 16px 20px;
+                padding: 18px 20px;
                 border: 3px solid #6c757d;
                 border-radius: 10px;
                 font-size: 16px;
@@ -245,9 +245,10 @@ class LoginDialog(QDialog):
                 color: #212529;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 25px;
-                font-weight: 500;
-                margin: 5px 0px;
+                min-height: 30px;
+                max-height: 60px;
+                font-weight: 600;
+                margin: 6px 0px;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
@@ -257,47 +258,116 @@ class LoginDialog(QDialog):
             QLineEdit::placeholder {
                 color: #6c757d;
                 font-style: italic;
-                font-weight: 400;
+                font-weight: 500;
             }
             QLabel {
                 font-weight: 700;
                 color: #495057;
-                font-size: 15px;
-                padding: 8px 0px;
-                margin: 5px 0px;
+                font-size: 16px;
+                padding: 10px 0px;
+                margin: 6px 0px;
+                min-height: 30px;
+            }
+            QComboBox {
+                padding: 18px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 10px;
+                font-size: 16px;
+                background-color: white;
+                color: #212529;
+                min-height: 30px;
+                max-height: 60px;
+                font-weight: 600;
+                margin: 6px 0px;
+            }
+            QComboBox:focus {
+                border-color: #0d6efd;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            }
+            QComboBox::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 32px;
+                border-left: 3px solid #6c757d;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                background-color: #e9ecef;
+            }
+            QComboBox::drop-down:hover {
+                background-color: #dee2e6;
+            }
+            QComboBox::down-arrow {
+                image: none;
+                border: 3px solid #212529;
+                width: 10px;
+                height: 10px;
+                border-top: none;
+                border-right: none;
+                margin-top: -3px;
+            }
+            QComboBox QAbstractItemView {
+                border: 3px solid #0d6efd;
+                background-color: white;
+                color: #212529;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                font-size: 16px;
+                padding: 8px;
+                outline: none;
+                font-weight: 600;
+            }
+            QComboBox QAbstractItemView::item {
+                padding: 18px 20px;
+                color: #212529;
+                background-color: white;
+                border: none;
+                min-height: 35px;
+                font-weight: 600;
+            }
+            QComboBox QAbstractItemView::item:selected {
+                background-color: #0d6efd;
+                color: white;
+                font-weight: 700;
+            }
+            QComboBox QAbstractItemView::item:hover {
+                background-color: #cce7ff;
+                color: #212529;
+                font-weight: 700;
             }
             QTabWidget::pane {
                 border: 3px solid #dee2e6;
                 background-color: white;
                 border-radius: 10px;
                 margin-top: 10px;
-                padding: 15px;
+                padding: 20px;
             }
             QTabBar::tab {
                 background-color: #e9ecef;
-                padding: 15px 30px;
+                padding: 18px 35px;
                 margin-right: 5px;
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
                 color: #495057;
-                font-weight: 600;
-                font-size: 14px;
-                min-width: 120px;
+                font-weight: 700;
+                font-size: 15px;
+                min-width: 130px;
+                min-height: 25px;
             }
             QTabBar::tab:selected {
                 background-color: white;
                 border-bottom: 4px solid #0d6efd;
                 color: #0d6efd;
                 font-weight: 700;
-                font-size: 15px;
+                font-size: 16px;
             }
             QTabBar::tab:hover {
                 background-color: #dee2e6;
                 color: #212529;
             }
             QFormLayout {
-                margin: 20px;
-                spacing: 15px;
+                margin: 25px;
+                spacing: 20px;
             }
         """)
     
