@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon, QFont
 from database import DatabaseManager
-from src.utils.app_translator import get_text, set_language, get_available_locales
+from src.utils.app_translator import get_text, set_language, get_available_locales, get_translator
 import os
 import json
 
@@ -98,7 +98,7 @@ class LoginDialog(QDialog):
         """)
         
         # Create tab widget
-        tab_widget = QTabWidget()
+        self.tab_widget = QTabWidget()
         
         # Login tab
         login_tab = QWidget()
@@ -121,9 +121,9 @@ class LoginDialog(QDialog):
         login_layout.addRow("Username:", self.username_input)
         login_layout.addRow("Password:", self.password_input)
         
-        login_button = QPushButton("Login")
-        login_button.clicked.connect(self.login)
-        login_button.setStyleSheet("""
+        self.login_button = QPushButton("Login")
+        self.login_button.clicked.connect(self.login)
+        self.login_button.setStyleSheet("""
             QPushButton {
                 background-color: #198754;
                 color: white;
@@ -148,7 +148,7 @@ class LoginDialog(QDialog):
             }
         """)
         
-        login_layout.addRow("", login_button)
+        login_layout.addRow("", self.login_button)
         login_tab.setLayout(login_layout)
         
         # Setup tab
@@ -182,9 +182,9 @@ class LoginDialog(QDialog):
         setup_layout.addRow("User Password:", self.setup_password)
         setup_layout.addRow("Confirm Password:", self.setup_password_confirm)
         
-        setup_button = QPushButton("Create Database & User")
-        setup_button.clicked.connect(self.setup_database)
-        setup_button.setStyleSheet("""
+        self.setup_button = QPushButton("Create Database & User")
+        self.setup_button.clicked.connect(self.setup_database)
+        self.setup_button.setStyleSheet("""
             QPushButton {
                 background-color: #0d6efd;
                 color: white;
@@ -209,19 +209,19 @@ class LoginDialog(QDialog):
             }
         """)
         
-        setup_layout.addRow("", setup_button)
+        setup_layout.addRow("", self.setup_button)
         setup_tab.setLayout(setup_layout)
         
         # Add tabs
-        tab_widget.addTab(login_tab, "Login")
+        self.tab_widget.addTab(login_tab, "Login")
         
         # Only show setup tab if database doesn't exist
         if not os.path.exists("secure_app.db.enc"):
-            tab_widget.addTab(setup_tab, "Initial Setup")
-            tab_widget.setCurrentIndex(1)  # Start with setup tab
+            self.tab_widget.addTab(setup_tab, "Initial Setup")
+            self.tab_widget.setCurrentIndex(1)  # Start with setup tab
         
         main_layout.addWidget(self.title_label)
-        main_layout.addWidget(tab_widget)
+        main_layout.addWidget(self.tab_widget)
         
         self.setLayout(main_layout)
         
