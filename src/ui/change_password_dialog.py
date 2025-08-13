@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QFormLayout, QLineEdit,
                             QPushButton, QMessageBox, QLabel)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 
 class ChangePasswordDialog(QDialog):
     def __init__(self, db_manager, username):
@@ -12,7 +13,7 @@ class ChangePasswordDialog(QDialog):
     
     def init_ui(self):
         self.setWindowTitle("Change Password")
-        self.setFixedSize(350, 200)
+        self.setFixedSize(480, 300)
         self.setModal(True)
         
         # Main layout
@@ -99,29 +100,38 @@ class ChangePasswordDialog(QDialog):
             QDialog {
                 background-color: #f8f9fa;
                 color: #212529;
+                font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLineEdit {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #212529;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                min-height: 30px;
+                max-height: 60px;
+                font-weight: 600;
+                margin: 6px 0px;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #6c757d;
                 font-style: italic;
+                font-weight: 500;
             }
             QLabel {
-                font-weight: 600;
+                font-weight: 700;
                 color: #495057;
-                font-size: 12px;
+                font-size: 16px;
+                min-height: 32px;
+                padding: 8px 0px;
             }
         """)
     

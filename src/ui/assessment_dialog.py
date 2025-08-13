@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
                             QMessageBox, QScrollArea, QWidget)
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 
 class AssessmentDialog(QDialog):
     def __init__(self, person_name, person_id, assessment_data=None, parent=None):
@@ -121,37 +122,55 @@ class AssessmentDialog(QDialog):
             QLabel {
                 font-weight: 700;
                 color: #000000;
-                font-size: 12px;
-                margin-bottom: 4px;
+                font-size: 16px;
+                margin-bottom: 8px;
+                min-height: 32px;
+                padding: 8px 0px;
             }
-            QLineEdit, QTextEdit, QDateEdit {
-                padding: 8px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+            QLineEdit, QDateEdit {
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
+                margin: 6px 0px;
+            }
+            QTextEdit {
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
+                background-color: white;
+                color: #000000;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 120px;
+                font-weight: 600;
+                margin: 6px 0px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                line-height: 1.5;
             }
             QLineEdit:focus, QTextEdit:focus, QDateEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
-            }
-            QTextEdit {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                line-height: 1.4;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QPushButton {
                 background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 120px;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 16px;
+                min-width: 140px;
+                min-height: 25px;
             }
             QPushButton:hover {
                 background-color: #0b5ed7;

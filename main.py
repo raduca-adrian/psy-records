@@ -10,8 +10,8 @@ import os
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor, QFont
-from login_dialog import LoginDialog
-from main_window import MainWindow
+from src.ui.login_dialog import LoginDialog
+from src.ui.main_window import MainWindow
 
 def ensure_encrypted_database_only():
     """Ensure only encrypted database files are used for security."""

@@ -8,6 +8,7 @@ from PyQt6.QtGui import QAction, QIcon, QFont
 from person_dialog import PersonDialog
 from change_password_dialog import ChangePasswordDialog
 from src.utils.app_translator import get_text
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 from datetime import datetime
 
 class MainWindow(QMainWindow):
@@ -15,6 +16,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.db_manager = db_manager
         self.username = username
+        self.language_manager = get_language_manager()
+        # Register for language change notifications
+        self.language_manager.register_language_change_callback(self.on_language_updated)
         self.init_ui()
         self.load_persons()
         
@@ -634,6 +638,37 @@ class MainWindow(QMainWindow):
         self.change_password_action = QAction(self.get_text('menu.change_password'), self)
         self.change_password_action.triggered.connect(self.change_password)
         self.account_menu.addAction(self.change_password_action)
+        
+        # Language menu
+        self.language_menu = menubar.addMenu(self.get_text('menu.language'))
+        self.create_language_menu()
+    
+    def create_language_menu(self):
+        """Create language selection menu."""
+        self.language_menu.clear()
+        
+        # Create language action group for radio button behavior
+        from PyQt6.QtGui import QActionGroup
+        self.language_action_group = QActionGroup(self)
+        
+        current_language = self.language_manager.get_current_language()
+        
+        for locale in self.language_manager.get_available_languages():
+            display_name = self.language_manager.get_language_display_name(locale)
+            action = QAction(display_name, self)
+            action.setCheckable(True)
+            action.setChecked(locale == current_language)
+            action.setData(locale)
+            action.triggered.connect(lambda checked, loc=locale: self.change_app_language(loc))
+            
+            self.language_action_group.addAction(action)
+            self.language_menu.addAction(action)
+    
+    def change_app_language(self, locale: str):
+        """Change the application language."""
+        if self.language_manager.change_language(locale):
+            # Update the language menu to reflect the change
+            self.create_language_menu()
     
     def load_persons(self):
         """Load all persons from database into the table"""
@@ -763,7 +798,13 @@ class MainWindow(QMainWindow):
     
     def get_text(self, key):
         """Get translated text."""
-        return get_text(key, key)
+        return lang_get_text(key, key)
+    
+    def on_language_updated(self, locale: str):
+        """Called when language is changed from anywhere in the application."""
+        self.update_ui_texts()
+        # Refresh the persons table to update any displayed text
+        self.load_persons()
     
     def update_ui_texts(self):
         """Update all UI text elements with current language."""
@@ -787,7 +828,7 @@ class MainWindow(QMainWindow):
             self.add_button.setText(self.get_text('main_window.add_person'))
             self.edit_button.setText(self.get_text('main_window.edit_person'))
             self.delete_button.setText(self.get_text('main_window.delete_person'))
-            self.records_button.setText(self.get_text('main_window.psychological_records'))
+            self.medical_records_button.setText(self.get_text('main_window.psychological_records'))
             self.refresh_button.setText(self.get_text('main_window.refresh'))
         except AttributeError:
             pass
@@ -830,6 +871,11 @@ class MainWindow(QMainWindow):
             # Update Account menu
             self.account_menu.setTitle(self.get_text('menu.account'))
             self.change_password_action.setText(self.get_text('menu.change_password'))
+            
+            # Update Language menu
+            self.language_menu.setTitle(self.get_text('menu.language'))
+            # Recreate language menu to update display names
+            self.create_language_menu()
         except AttributeError:
             pass
         

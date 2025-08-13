@@ -5,9 +5,10 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
                             QMenu, QStatusBar, QToolBar, QLineEdit, QDialog)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon, QFont
-from .person_dialog import PersonDialog
-from .change_password_dialog import ChangePasswordDialog
-from ..utils.translator import _
+from src.ui.person_dialog import PersonDialog
+from src.ui.change_password_dialog import ChangePasswordDialog
+from src.utils.app_translator import get_text
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 from datetime import datetime
 
 class MainWindow(QMainWindow):
@@ -15,6 +16,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.db_manager = db_manager
         self.username = username
+        self.language_manager = get_language_manager()
+        # Register for language change notifications
+        self.language_manager.register_language_change_callback(self.on_language_updated)
         self.init_ui()
         self.load_persons()
         
@@ -24,7 +28,7 @@ class MainWindow(QMainWindow):
         self.refresh_timer.start(30000)  # Refresh every 30 seconds
     
     def init_ui(self):
-        self.setWindowTitle(f"{_('main_window.title')} - {_('main_window.logged_in_as')}: {self.username}")
+        self.setWindowTitle(f"Secure Database Application - Welcome, {self.username}")
         self.setGeometry(100, 100, 800, 600)
         
         # Create central widget
@@ -37,12 +41,12 @@ class MainWindow(QMainWindow):
         # Header with enhanced styling
         header_layout = QHBoxLayout()
         
-        title_label = QLabel(_('main_window.title'))
+        self.title_label = QLabel(self.get_text('main_window.title'))
         title_font = QFont()
         title_font.setPointSize(22)
         title_font.setBold(True)
-        title_label.setFont(title_font)
-        title_label.setStyleSheet("""
+        self.title_label.setFont(title_font)
+        self.title_label.setStyleSheet("""
             QLabel {
                 color: #000000;
                 padding: 15px 20px;
@@ -57,7 +61,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        user_label = QLabel(f"👤 {_('main_window.logged_in_as')}: {self.username}")
+        user_label = QLabel(f"👤 {self.get_text('main_window.logged_in_as')}: {self.username}")
         user_label.setStyleSheet("""
             QLabel {
                 color: #000000;
@@ -73,14 +77,14 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        header_layout.addWidget(title_label)
+        header_layout.addWidget(self.title_label)
         header_layout.addStretch()
         header_layout.addWidget(user_label)
         
         # Search bar with enhanced styling
         search_layout = QHBoxLayout()
-        search_label = QLabel(f"🔍 {_('main_window.search')}:")
-        search_label.setStyleSheet("""
+        self.search_label = QLabel(f"🔍 {self.get_text('main_window.search')}:")
+        self.search_label.setStyleSheet("""
             QLabel {
                 color: #000000;
                 font-weight: 800;
@@ -95,7 +99,7 @@ class MainWindow(QMainWindow):
         """)
         
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText(_('main_window.search_placeholder'))
+        self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
         self.search_input.textChanged.connect(self.filter_table)
         self.search_input.setMaximumWidth(400)
         self.search_input.setMinimumHeight(40)
@@ -123,14 +127,14 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        search_layout.addWidget(search_label)
+        search_layout.addWidget(self.search_label)
         search_layout.addWidget(self.search_input)
         search_layout.addStretch()
         
         # Buttons layout
         button_layout = QHBoxLayout()
         
-        self.add_button = QPushButton("➕ Add Person")
+        self.add_button = QPushButton(f"➕ {self.get_text('main_window.add_person')}")
         self.add_button.clicked.connect(self.add_person)
         self.add_button.setStyleSheet("""
             QPushButton {
@@ -156,7 +160,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        self.edit_button = QPushButton("✏️ Edit Person")
+        self.edit_button = QPushButton(f"✏️ {self.get_text('main_window.edit_person')}")
         self.edit_button.clicked.connect(self.edit_person)
         self.edit_button.setEnabled(False)
         self.edit_button.setStyleSheet("""
@@ -189,7 +193,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        self.delete_button = QPushButton("🗑️ Delete Person")
+        self.delete_button = QPushButton(f"🗑️ {self.get_text('main_window.delete_person')}")
         self.delete_button.clicked.connect(self.delete_person)
         self.delete_button.setEnabled(False)
         self.delete_button.setStyleSheet("""
@@ -222,7 +226,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        self.refresh_button = QPushButton("🔄 Refresh")
+        self.refresh_button = QPushButton(f"🔄 {self.get_text('main_window.refresh')}")
         self.refresh_button.clicked.connect(self.load_persons)
         self.refresh_button.setStyleSheet("""
             QPushButton {
@@ -248,7 +252,7 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        self.medical_records_button = QPushButton("🧠 Psychological Records")
+        self.medical_records_button = QPushButton(f"🧠 {self.get_text('main_window.psychological_records')}")
         self.medical_records_button.clicked.connect(self.open_medical_records)
         self.medical_records_button.setEnabled(False)
         self.medical_records_button.setStyleSheet("""
@@ -291,7 +295,12 @@ class MainWindow(QMainWindow):
         # Table
         self.table = QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["ID", "Name", "CNP", "Created"])
+        self.table.setHorizontalHeaderLabels([
+            self.get_text('main_window.id'), 
+            self.get_text('main_window.name'), 
+            self.get_text('main_window.cnp'), 
+            self.get_text('main_window.created')
+        ])
         
         # Hide ID column
         self.table.setColumnHidden(0, True)
@@ -372,7 +381,10 @@ class MainWindow(QMainWindow):
         # Create status bar
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("Ready")
+        self.status_bar.showMessage(self.get_text('main_window.ready'))
+        
+        # Apply initial translations
+        self.update_ui_texts()
         
         # Apply enhanced main window styling for better visibility
         self.setStyleSheet("""
@@ -418,20 +430,22 @@ class MainWindow(QMainWindow):
                 font-weight: 700;
             }
             QLineEdit {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 20px;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #495057;
@@ -439,28 +453,30 @@ class MainWindow(QMainWindow):
                 font-weight: 500;
             }
             QComboBox {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 20px;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
             }
             QComboBox:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QComboBox::drop-down {
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
-                width: 25px;
-                border-left: 2px solid #6c757d;
-                border-top-right-radius: 6px;
-                border-bottom-right-radius: 6px;
+                width: 32px;
+                border-left: 3px solid #6c757d;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
                 background-color: #e9ecef;
             }
             QComboBox::drop-down:hover {
@@ -468,32 +484,32 @@ class MainWindow(QMainWindow):
             }
             QComboBox::down-arrow {
                 image: none;
-                border: 2px solid #000000;
-                width: 6px;
-                height: 6px;
+                border: 3px solid #000000;
+                width: 10px;
+                height: 10px;
                 border-top: none;
                 border-right: none;
                 transform: rotate(45deg);
                 margin-top: -3px;
             }
             QComboBox QAbstractItemView {
-                border: 2px solid #0d6efd;
+                border: 3px solid #0d6efd;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                font-size: 13px;
-                padding: 4px;
+                font-size: 16px;
+                padding: 8px;
                 outline: none;
                 font-weight: 600;
-                min-width: 150px;
+                min-width: 200px;
             }
             QComboBox QAbstractItemView::item {
-                padding: 10px 12px;
+                padding: 16px 20px;
                 color: #000000;
                 background-color: white;
                 border: none;
-                min-height: 25px;
+                min-height: 35px;
                 font-weight: 600;
             }
             QComboBox QAbstractItemView::item:selected {
@@ -505,6 +521,13 @@ class MainWindow(QMainWindow):
                 background-color: #cce7ff;
                 color: #000000;
                 font-weight: 700;
+            }
+            QLabel {
+                color: #212529;
+                font-weight: 700;
+                font-size: 16px;
+                padding: 10px 4px;
+                min-height: 32px;
             }
             QTableWidget {
                 background-color: white;
@@ -577,44 +600,75 @@ class MainWindow(QMainWindow):
         menubar = self.menuBar()
         
         # File menu
-        file_menu = menubar.addMenu('File')
+        self.file_menu = menubar.addMenu(self.get_text('menu.file'))
         
-        refresh_action = QAction('Refresh', self)
-        refresh_action.setShortcut('F5')
-        refresh_action.triggered.connect(self.load_persons)
-        file_menu.addAction(refresh_action)
+        self.refresh_action = QAction(self.get_text('menu.refresh'), self)
+        self.refresh_action.setShortcut('F5')
+        self.refresh_action.triggered.connect(self.load_persons)
+        self.file_menu.addAction(self.refresh_action)
         
-        file_menu.addSeparator()
+        self.file_menu.addSeparator()
         
-        exit_action = QAction('Exit', self)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
+        self.exit_action = QAction(self.get_text('menu.exit'), self)
+        self.exit_action.setShortcut('Ctrl+Q')
+        self.exit_action.triggered.connect(self.close)
+        self.file_menu.addAction(self.exit_action)
         
         # Edit menu
-        edit_menu = menubar.addMenu('Edit')
+        self.edit_menu = menubar.addMenu(self.get_text('menu.edit'))
         
-        add_action = QAction('Add Person', self)
-        add_action.setShortcut('Ctrl+N')
-        add_action.triggered.connect(self.add_person)
-        edit_menu.addAction(add_action)
+        self.add_person_action = QAction(self.get_text('menu.add_person'), self)
+        self.add_person_action.setShortcut('Ctrl+N')
+        self.add_person_action.triggered.connect(self.add_person)
+        self.edit_menu.addAction(self.add_person_action)
         
-        edit_action = QAction('Edit Person', self)
-        edit_action.setShortcut('Ctrl+E')
-        edit_action.triggered.connect(self.edit_person)
-        edit_menu.addAction(edit_action)
+        self.edit_person_action = QAction(self.get_text('menu.edit_person'), self)
+        self.edit_person_action.setShortcut('Ctrl+E')
+        self.edit_person_action.triggered.connect(self.edit_person)
+        self.edit_menu.addAction(self.edit_person_action)
         
-        delete_action = QAction('Delete Person', self)
-        delete_action.setShortcut('Delete')
-        delete_action.triggered.connect(self.delete_person)
-        edit_menu.addAction(delete_action)
+        self.delete_person_action = QAction(self.get_text('menu.delete_person'), self)
+        self.delete_person_action.setShortcut('Delete')
+        self.delete_person_action.triggered.connect(self.delete_person)
+        self.edit_menu.addAction(self.delete_person_action)
         
         # Account menu
-        account_menu = menubar.addMenu('Account')
+        self.account_menu = menubar.addMenu(self.get_text('menu.account'))
         
-        change_password_action = QAction('Change Password', self)
-        change_password_action.triggered.connect(self.change_password)
-        account_menu.addAction(change_password_action)
+        self.change_password_action = QAction(self.get_text('menu.change_password'), self)
+        self.change_password_action.triggered.connect(self.change_password)
+        self.account_menu.addAction(self.change_password_action)
+        
+        # Language menu
+        self.language_menu = menubar.addMenu(self.get_text('menu.language'))
+        self.create_language_menu()
+    
+    def create_language_menu(self):
+        """Create language selection menu."""
+        self.language_menu.clear()
+        
+        # Create language action group for radio button behavior
+        from PyQt6.QtGui import QActionGroup
+        self.language_action_group = QActionGroup(self)
+        
+        current_language = self.language_manager.get_current_language()
+        
+        for locale in self.language_manager.get_available_languages():
+            display_name = self.language_manager.get_language_display_name(locale)
+            action = QAction(display_name, self)
+            action.setCheckable(True)
+            action.setChecked(locale == current_language)
+            action.setData(locale)
+            action.triggered.connect(lambda checked, loc=locale: self.change_app_language(loc))
+            
+            self.language_action_group.addAction(action)
+            self.language_menu.addAction(action)
+    
+    def change_app_language(self, locale: str):
+        """Change the application language."""
+        if self.language_manager.change_language(locale):
+            # Update the language menu to reflect the change
+            self.create_language_menu()
     
     def load_persons(self):
         """Load all persons from database into the table"""
@@ -637,8 +691,8 @@ class MainWindow(QMainWindow):
             self.status_bar.showMessage(f"Loaded {len(persons)} persons")
             
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to load persons: {str(e)}")
-            self.status_bar.showMessage("Error loading data")
+            QMessageBox.critical(self, self.get_text('common.error'), f"{self.get_text('main_window.error_loading')}: {str(e)}")
+            self.status_bar.showMessage(self.get_text('main_window.error_loading_status'))
     
     def filter_table(self, text):
         """Filter table based on search text"""
@@ -684,7 +738,7 @@ class MainWindow(QMainWindow):
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 self.load_persons()
         else:
-            QMessageBox.warning(self, "Warning", "Please select a person to edit.")
+            QMessageBox.warning(self, self.get_text('common.warning'), self.get_text('main_window.select_person_edit'))
     
     def delete_person(self):
         """Delete the selected person"""
@@ -705,7 +759,7 @@ class MainWindow(QMainWindow):
                 else:
                     QMessageBox.critical(self, "Error", "Failed to delete person.")
         else:
-            QMessageBox.warning(self, "Warning", "Please select a person to delete.")
+            QMessageBox.warning(self, self.get_text('common.warning'), self.get_text('main_window.select_person_delete'))
     
     def change_password(self):
         """Open dialog to change password"""
@@ -717,13 +771,13 @@ class MainWindow(QMainWindow):
         person_data = self.get_selected_person()
         if person_data:
             # Import here to avoid circular imports
-            from medical_records_window import MedicalRecordsWindow
+            from src.ui.medical_records_window import MedicalRecordsWindow
             
             # Create and show psychological records window
             records_window = MedicalRecordsWindow(person_data, self.db_manager, self)
             records_window.show()
         else:
-            QMessageBox.warning(self, "Warning", "Please select a person to view psychological records.")
+            QMessageBox.warning(self, self.get_text('common.warning'), self.get_text('main_window.select_person_records'))
     
     def closeEvent(self, event):
         """Handle application close event"""
@@ -741,3 +795,87 @@ class MainWindow(QMainWindow):
             event.accept()
         else:
             event.ignore()
+    
+    def get_text(self, key):
+        """Get translated text."""
+        return lang_get_text(key, key)
+    
+    def on_language_updated(self, locale: str):
+        """Called when language is changed from anywhere in the application."""
+        self.update_ui_texts()
+        # Refresh the persons table to update any displayed text
+        self.load_persons()
+    
+    def update_ui_texts(self):
+        """Update all UI text elements with current language."""
+        self.setWindowTitle(f"{self.get_text('main_window.title')} - {self.get_text('main_window.logged_in_as')}, {self.username}")
+        
+        # Update main interface elements
+        try:
+            self.title_label.setText(self.get_text('main_window.title'))
+        except AttributeError:
+            pass
+        
+        # Update search elements
+        try:
+            self.search_label.setText(self.get_text('main_window.search'))
+            self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
+        except AttributeError:
+            pass
+        
+        # Update buttons
+        try:
+            self.add_button.setText(self.get_text('main_window.add_person'))
+            self.edit_button.setText(self.get_text('main_window.edit_person'))
+            self.delete_button.setText(self.get_text('main_window.delete_person'))
+            self.medical_records_button.setText(self.get_text('main_window.psychological_records'))
+            self.refresh_button.setText(self.get_text('main_window.refresh'))
+        except AttributeError:
+            pass
+        
+        # Update table headers
+        try:
+            self.table.setHorizontalHeaderLabels([
+                self.get_text('main_window.id'),
+                self.get_text('main_window.name'),
+                self.get_text('main_window.cnp'),
+                self.get_text('main_window.created')
+            ])
+        except AttributeError:
+            pass
+        
+        # Update menu items
+        self.update_menu_texts()
+        
+        # Update status bar
+        try:
+            if hasattr(self, 'status_bar'):
+                self.status_bar.showMessage(self.get_text('main_window.ready'))
+        except AttributeError:
+            pass
+    
+    def update_menu_texts(self):
+        """Update menu item texts."""
+        try:
+            # Update File menu
+            self.file_menu.setTitle(self.get_text('menu.file'))
+            self.refresh_action.setText(self.get_text('menu.refresh'))
+            self.exit_action.setText(self.get_text('menu.exit'))
+            
+            # Update Edit menu  
+            self.edit_menu.setTitle(self.get_text('menu.edit'))
+            self.add_person_action.setText(self.get_text('menu.add_person'))
+            self.edit_person_action.setText(self.get_text('menu.edit_person'))
+            self.delete_person_action.setText(self.get_text('menu.delete_person'))
+            
+            # Update Account menu
+            self.account_menu.setTitle(self.get_text('menu.account'))
+            self.change_password_action.setText(self.get_text('menu.change_password'))
+            
+            # Update Language menu
+            self.language_menu.setTitle(self.get_text('menu.language'))
+            # Recreate language menu to update display names
+            self.create_language_menu()
+        except AttributeError:
+            pass
+        

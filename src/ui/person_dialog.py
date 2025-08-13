@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QFormLayout, QLineEdit,
                             QPushButton, QMessageBox, QLabel, QHBoxLayout)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 import re
 
 class PersonDialog(QDialog):
@@ -18,7 +19,7 @@ class PersonDialog(QDialog):
     def init_ui(self):
         title = "Edit Person" if self.is_edit_mode else "Add New Person"
         self.setWindowTitle(title)
-        self.setFixedSize(400, 250)
+        self.setFixedSize(500, 350)
         self.setModal(True)
         
         # Main layout
@@ -111,20 +112,23 @@ class PersonDialog(QDialog):
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QLineEdit {
-                padding: 10px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
-                min-height: 20px;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
+                margin: 6px 0px;
             }
             QLineEdit:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QLineEdit::placeholder {
                 color: #495057;
@@ -134,18 +138,21 @@ class PersonDialog(QDialog):
             QLabel {
                 font-weight: 700;
                 color: #000000;
-                font-size: 12px;
-                margin-bottom: 4px;
+                font-size: 16px;
+                margin-bottom: 8px;
+                min-height: 32px;
+                padding: 8px 0px;
             }
             QPushButton {
                 background-color: #0d6efd;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 13px;
-                min-width: 80px;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 16px;
+                min-width: 120px;
+                min-height: 25px;
             }
             QPushButton:hover {
                 background-color: #0b5ed7;

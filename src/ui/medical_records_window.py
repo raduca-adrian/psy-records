@@ -5,10 +5,11 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont, QIcon
 import os
-from database import DatabaseManager
-from assessment_dialog import AssessmentDialog
-from consultation_dialog import ConsultationDialog
-from pdf_generator import generate_psychological_report
+from src.core.database import DatabaseManager
+from src.ui.assessment_dialog import AssessmentDialog
+from src.ui.consultation_dialog import ConsultationDialog
+from src.utils.pdf_generator import generate_psychological_report
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 
 class MedicalRecordsWindow(QMainWindow):
     def __init__(self, person_data, db_manager, parent=None):
@@ -19,8 +20,15 @@ class MedicalRecordsWindow(QMainWindow):
         self.person_name = person_data[1]
         self.person_cnp = person_data[2]
         
+        # Initialize language manager
+        self.language_manager = get_language_manager()
+        # Register for language change notifications
+        self.language_manager.register_language_change_callback(self.on_language_updated)
+        
         self.init_ui()
         self.load_medical_records()
+        # Apply initial language settings
+        self.update_ui_texts()
     
     def init_ui(self):
         self.setWindowTitle(f"Psychological Records - {self.person_name}")
@@ -39,28 +47,28 @@ class MedicalRecordsWindow(QMainWindow):
         header_layout = QVBoxLayout(header_frame)
         
         # Patient info header
-        title_label = QLabel(f"Psychological Records - {self.person_name}")
+        self.title_label = QLabel(f"Psychological Records - {self.person_name}")
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
-        title_label.setFont(title_font)
+        self.title_label.setFont(title_font)
         
-        info_label = QLabel(f"CNP: {self.person_cnp} | Client ID: {self.person_id}")
-        info_label.setStyleSheet("color: #6c757d; font-size: 12px;")
+        self.info_label = QLabel(f"CNP: {self.person_cnp} | Client ID: {self.person_id}")
+        self.info_label.setStyleSheet("color: #6c757d; font-size: 12px;")
         
         # Action buttons
         button_layout = QHBoxLayout()
         
-        self.add_assessment_btn = QPushButton("📋 New Psychological Assessment")
+        self.add_assessment_btn = QPushButton(f"📋 {self.get_text('psychological_records.new_assessment')}")
         self.add_assessment_btn.clicked.connect(self.add_assessment)
         
-        self.add_consultation_btn = QPushButton("� New Therapy Session")
+        self.add_consultation_btn = QPushButton(f"💬 {self.get_text('psychological_records.new_session')}")
         self.add_consultation_btn.clicked.connect(self.add_consultation)
         
-        self.generate_report_btn = QPushButton("📄 Generate Clinical Report")
+        self.generate_report_btn = QPushButton(f"📄 {self.get_text('psychological_records.generate_report')}")
         self.generate_report_btn.clicked.connect(self.generate_pdf_report)
         
-        self.refresh_btn = QPushButton("🔄 Refresh")
+        self.refresh_btn = QPushButton(f"🔄 {self.get_text('main_window.refresh')}")
         self.refresh_btn.clicked.connect(self.load_medical_records)
         
         button_layout.addWidget(self.add_assessment_btn)
@@ -69,8 +77,8 @@ class MedicalRecordsWindow(QMainWindow):
         button_layout.addWidget(self.generate_report_btn)
         button_layout.addWidget(self.refresh_btn)
         
-        header_layout.addWidget(title_label)
-        header_layout.addWidget(info_label)
+        header_layout.addWidget(self.title_label)
+        header_layout.addWidget(self.info_label)
         header_layout.addLayout(button_layout)
         
         main_layout.addWidget(header_frame)
@@ -81,12 +89,12 @@ class MedicalRecordsWindow(QMainWindow):
         # Assessments tab
         self.assessments_tab = QWidget()
         self.setup_assessments_tab()
-        self.tab_widget.addTab(self.assessments_tab, "📋 Psychological Assessments")
+        self.tab_widget.addTab(self.assessments_tab, f"📋 {self.get_text('psychological_records.assessments_tab')}")
         
         # Consultations tab
         self.consultations_tab = QWidget()
         self.setup_consultations_tab()
-        self.tab_widget.addTab(self.consultations_tab, "� Therapy Sessions")
+        self.tab_widget.addTab(self.consultations_tab, f"💬 {self.get_text('psychological_records.sessions_tab')}")
         
         main_layout.addWidget(self.tab_widget)
         
@@ -226,7 +234,12 @@ class MedicalRecordsWindow(QMainWindow):
         self.assessments_table = QTableWidget()
         self.assessments_table.setColumnCount(6)
         self.assessments_table.setHorizontalHeaderLabels([
-            "Date", "Chief Complaint", "Diagnosis", "Treatment Plan", "Created", "Actions"
+            self.get_text("psychological_records.date"), 
+            self.get_text("psychological_records.presenting_problem"), 
+            self.get_text("assessment.clinical_impressions"), 
+            self.get_text("assessment.treatment_goals"), 
+            self.get_text("main_window.created"), 
+            self.get_text("psychological_records.actions")
         ])
         
         # Set column widths
@@ -251,7 +264,13 @@ class MedicalRecordsWindow(QMainWindow):
         self.consultations_table = QTableWidget()
         self.consultations_table.setColumnCount(7)
         self.consultations_table.setHorizontalHeaderLabels([
-            "Date", "Type", "Symptoms", "Findings", "Recommendations", "Next Appt", "Actions"
+            self.get_text("psychological_records.date"), 
+            self.get_text("psychological_records.session_type"), 
+            self.get_text("psychological_records.session_focus"), 
+            self.get_text("session.clinical_observations"), 
+            self.get_text("psychological_records.interventions"), 
+            self.get_text("session.next_session"), 
+            self.get_text("psychological_records.actions")
         ])
         
         # Set column widths
@@ -307,7 +326,7 @@ class MedicalRecordsWindow(QMainWindow):
             actions_layout = QHBoxLayout(actions_widget)
             actions_layout.setContentsMargins(4, 4, 4, 4)
             
-            edit_btn = QPushButton("✏️ Edit")
+            edit_btn = QPushButton(f"✏️ {self.get_text('common.edit')}")
             edit_btn.setStyleSheet("""
                 QPushButton { 
                     min-width: 60px; 
@@ -325,7 +344,7 @@ class MedicalRecordsWindow(QMainWindow):
             """)
             edit_btn.clicked.connect(lambda checked, aid=assessment_id, data=assessment: self.edit_assessment(aid, data))
             
-            delete_btn = QPushButton("🗑️ Delete")
+            delete_btn = QPushButton(f"🗑️ {self.get_text('common.delete')}")
             delete_btn.setStyleSheet("""
                 QPushButton { 
                     min-width: 60px; 
@@ -384,7 +403,7 @@ class MedicalRecordsWindow(QMainWindow):
             actions_layout = QHBoxLayout(actions_widget)
             actions_layout.setContentsMargins(4, 4, 4, 4)
             
-            edit_btn = QPushButton("✏️ Edit")
+            edit_btn = QPushButton(f"✏️ {self.get_text('common.edit')}")
             edit_btn.setStyleSheet("""
                 QPushButton { 
                     min-width: 60px; 
@@ -402,7 +421,7 @@ class MedicalRecordsWindow(QMainWindow):
             """)
             edit_btn.clicked.connect(lambda checked, cid=consultation_id, data=consultation: self.edit_consultation(cid, data))
             
-            delete_btn = QPushButton("🗑️ Delete")
+            delete_btn = QPushButton(f"🗑️ {self.get_text('common.delete')}")
             delete_btn.setStyleSheet("""
                 QPushButton { 
                     min-width: 60px; 
@@ -596,3 +615,73 @@ class MedicalRecordsWindow(QMainWindow):
                 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred while generating the report:\n{str(e)}")
+    
+    def get_text(self, key):
+        """Get translated text."""
+        return lang_get_text(key, key)
+    
+    def on_language_updated(self, locale: str):
+        """Called when language is changed from anywhere in the application."""
+        self.update_ui_texts()
+        self.load_medical_records()  # Refresh tables to update headers
+    
+    def update_ui_texts(self):
+        """Update all UI text elements with current language."""
+        # Update window title
+        self.setWindowTitle(f"{self.get_text('psychological_records.title')} - {self.person_name}")
+        
+        # Update main title and info labels
+        try:
+            self.title_label.setText(f"{self.get_text('psychological_records.title')} - {self.person_name}")
+            self.info_label.setText(f"CNP: {self.person_cnp} | {self.get_text('psychological_records.client_id')}: {self.person_id}")
+        except (AttributeError, RuntimeError):
+            pass
+        
+        # Update buttons
+        try:
+            self.add_assessment_btn.setText(f"📋 {self.get_text('psychological_records.new_assessment')}")
+            self.add_consultation_btn.setText(f"💬 {self.get_text('psychological_records.new_session')}")
+            self.generate_report_btn.setText(f"📄 {self.get_text('psychological_records.generate_report')}")
+            self.refresh_btn.setText(f"🔄 {self.get_text('main_window.refresh')}")
+        except (AttributeError, RuntimeError):
+            pass
+        
+        # Update tab titles
+        try:
+            self.tab_widget.setTabText(0, f"📋 {self.get_text('psychological_records.assessments_tab')}")
+            self.tab_widget.setTabText(1, f"💬 {self.get_text('psychological_records.sessions_tab')}")
+        except (AttributeError, RuntimeError):
+            pass
+        
+        # Update table headers
+        try:
+            self.assessments_table.setHorizontalHeaderLabels([
+                self.get_text("psychological_records.date"), 
+                self.get_text("psychological_records.presenting_problem"), 
+                self.get_text("assessment.clinical_impressions"), 
+                self.get_text("assessment.treatment_goals"), 
+                self.get_text("main_window.created"), 
+                self.get_text("psychological_records.actions")
+            ])
+        except (AttributeError, RuntimeError):
+            pass
+        
+        try:
+            self.consultations_table.setHorizontalHeaderLabels([
+                self.get_text("psychological_records.date"), 
+                self.get_text("psychological_records.session_type"), 
+                self.get_text("psychological_records.session_focus"), 
+                self.get_text("session.clinical_observations"), 
+                self.get_text("psychological_records.interventions"), 
+                self.get_text("session.next_session"), 
+                self.get_text("psychological_records.actions")
+            ])
+        except (AttributeError, RuntimeError):
+            pass
+    
+    def closeEvent(self, event):
+        """Clean up when window is closed."""
+        # Unregister language change callback
+        if hasattr(self, 'language_manager'):
+            self.language_manager.unregister_language_change_callback(self.on_language_updated)
+        super().closeEvent(event)

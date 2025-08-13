@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
                             QMessageBox, QScrollArea, QWidget, QComboBox)
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont
+from src.utils.language_manager import get_language_manager, get_text as lang_get_text
 
 class ConsultationDialog(QDialog):
     def __init__(self, person_name, person_id, consultation_data=None, parent=None):
@@ -137,42 +138,73 @@ class ConsultationDialog(QDialog):
             QLabel {
                 font-weight: 700;
                 color: #000000;
-                font-size: 12px;
-                margin-bottom: 4px;
+                font-size: 16px;
+                margin-bottom: 8px;
+                min-height: 32px;
+                padding: 8px 0px;
             }
-            QLineEdit, QTextEdit, QDateEdit, QComboBox {
-                padding: 8px 12px;
-                border: 2px solid #6c757d;
-                border-radius: 6px;
-                font-size: 13px;
+            QLineEdit, QDateEdit {
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
                 background-color: white;
                 color: #000000;
                 selection-background-color: #0d6efd;
                 selection-color: white;
+                min-height: 30px;
+                max-height: 60px;
                 font-weight: 600;
+                margin: 6px 0px;
+            }
+            QTextEdit {
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
+                background-color: white;
+                color: #000000;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 120px;
+                font-weight: 600;
+                margin: 6px 0px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                line-height: 1.5;
+            }
+            QComboBox {
+                padding: 16px 20px;
+                border: 3px solid #6c757d;
+                border-radius: 8px;
+                font-size: 16px;
+                background-color: white;
+                color: #000000;
+                selection-background-color: #0d6efd;
+                selection-color: white;
+                min-height: 30px;
+                max-height: 60px;
+                font-weight: 600;
+                margin: 6px 0px;
             }
             QLineEdit:focus, QTextEdit:focus, QDateEdit:focus, QComboBox:focus {
                 border-color: #0d6efd;
                 background-color: #ffffff;
-            }
-            QTextEdit {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                line-height: 1.4;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
             }
             QComboBox::drop-down {
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
-                width: 20px;
-                border-left: 1px solid #6c757d;
-                border-top-right-radius: 6px;
-                border-bottom-right-radius: 6px;
+                width: 32px;
+                border-left: 3px solid #6c757d;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
                 background-color: #e9ecef;
             }
             QComboBox::down-arrow {
                 image: none;
-                border: 2px solid #495057;
-                width: 6px;
-                height: 6px;
+                border: 3px solid #495057;
+                width: 10px;
+                height: 10px;
                 border-top: none;
                 border-right: none;
                 transform: rotate(45deg);
