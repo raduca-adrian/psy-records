@@ -1,0 +1,15 @@
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+recursive-include locales *.json
+recursive-include assets *.ico *.png
+recursive-include config *.spec *.nsi
+recursive-include docs *.md
+recursive-include scripts *.bat *.ps1
+exclude *.pyc
+exclude */__pycache__/*
+exclude .git/*
+exclude .vscode/*
+exclude .venv/*
+exclude data/*
