@@ -10,6 +10,7 @@ from src.ui.assessment_dialog import AssessmentDialog
 from src.ui.consultation_dialog import ConsultationDialog
 from src.utils.pdf_generator import generate_psychological_report
 from src.utils.language_manager import get_language_manager, get_text as lang_get_text
+from src.utils.theme_manager import get_theme_manager, ThemeMode
 
 class MedicalRecordsWindow(QMainWindow):
     def __init__(self, person_data, db_manager, parent=None):
@@ -25,10 +26,16 @@ class MedicalRecordsWindow(QMainWindow):
         # Register for language change notifications
         self.language_manager.register_language_change_callback(self.on_language_updated)
         
+        # Initialize theme manager
+        self.theme_manager = get_theme_manager()
+        # Register for theme change notifications  
+        self.theme_manager.register_theme_change_callback(self.on_theme_updated)
+        
         self.init_ui()
         self.load_medical_records()
-        # Apply initial language settings
+        # Apply initial language and theme settings
         self.update_ui_texts()
+        self.apply_styling()
     
     def init_ui(self):
         self.setWindowTitle(f"Psychological Records - {self.person_name}")
@@ -71,11 +78,18 @@ class MedicalRecordsWindow(QMainWindow):
         self.refresh_btn = QPushButton(f"🔄 {self.get_text('main_window.refresh')}")
         self.refresh_btn.clicked.connect(self.load_medical_records)
         
+        # Theme toggle button
+        self.theme_toggle_btn = QPushButton()
+        self.theme_toggle_btn.setFixedSize(36, 36)
+        self.theme_toggle_btn.setObjectName("theme_toggle_btn")
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
+        
         button_layout.addWidget(self.add_assessment_btn)
         button_layout.addWidget(self.add_consultation_btn)
         button_layout.addStretch()
         button_layout.addWidget(self.generate_report_btn)
         button_layout.addWidget(self.refresh_btn)
+        button_layout.addWidget(self.theme_toggle_btn)
         
         header_layout.addWidget(self.title_label)
         header_layout.addWidget(self.info_label)
@@ -643,6 +657,9 @@ class MedicalRecordsWindow(QMainWindow):
             self.add_consultation_btn.setText(f"💬 {self.get_text('psychological_records.new_session')}")
             self.generate_report_btn.setText(f"📄 {self.get_text('psychological_records.generate_report')}")
             self.refresh_btn.setText(f"🔄 {self.get_text('main_window.refresh')}")
+            # Update theme toggle button tooltip
+            current_theme = self.theme_manager.get_current_theme()
+            self.theme_toggle_btn.setToolTip(self.get_text('common.theme_toggle_tooltip'))
         except (AttributeError, RuntimeError):
             pass
         
@@ -679,9 +696,117 @@ class MedicalRecordsWindow(QMainWindow):
         except (AttributeError, RuntimeError):
             pass
     
+    def toggle_theme(self):
+        """Toggle between light and dark theme."""
+        current_theme = self.theme_manager.get_current_theme()
+        new_theme = ThemeMode.DARK if current_theme == ThemeMode.LIGHT else ThemeMode.LIGHT
+        self.theme_manager.set_theme(new_theme)
+    
+    def on_theme_updated(self, theme_mode: ThemeMode):
+        """Called when theme is changed from anywhere in the application."""
+        self.apply_styling()
+        
+    def apply_styling(self):
+        """Apply theme-aware styling to the window."""
+        from src.ui.styles import colors
+        
+        current_theme = self.theme_manager.get_current_theme()
+        
+        # Update theme toggle button icon and tooltip
+        if current_theme == ThemeMode.DARK:
+            self.theme_toggle_btn.setText("☀️")
+            self.theme_toggle_btn.setToolTip(self.get_text('common.theme_toggle_tooltip'))
+        else:
+            self.theme_toggle_btn.setText("🌙")
+            self.theme_toggle_btn.setToolTip(self.get_text('common.theme_toggle_tooltip'))
+            
+        # Apply theme-aware styling to the main window
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {colors.background};
+                color: {colors.text};
+            }}
+            QFrame {{
+                background-color: {colors.card_background};
+                border: 1px solid {colors.border};
+                border-radius: 8px;
+                padding: 10px;
+            }}
+            QLabel {{
+                color: {colors.text};
+                background-color: transparent;
+            }}
+            QPushButton {{
+                background-color: {colors.primary};
+                color: {colors.primary_text};
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: bold;
+                min-height: 20px;
+            }}
+            QPushButton:hover {{
+                background-color: {colors.primary_hover};
+            }}
+            QPushButton:pressed {{
+                background-color: {colors.primary_pressed};
+            }}
+            QPushButton#theme_toggle_btn {{
+                background-color: {colors.surface};
+                color: {colors.text};
+                border: 2px solid {colors.border};
+                border-radius: 18px;
+                padding: 6px;
+                font-size: 16px;
+                min-width: 32px;
+                min-height: 32px;
+            }}
+            QPushButton#theme_toggle_btn:hover {{
+                background-color: {colors.surface_variant};
+                border-color: {colors.primary};
+            }}
+            QTabWidget::pane {{
+                border: 1px solid {colors.border};
+                background-color: {colors.surface};
+            }}
+            QTabBar::tab {{
+                background-color: {colors.surface};
+                color: {colors.text};
+                padding: 8px 16px;
+                margin-right: 2px;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                border: 1px solid {colors.border};
+            }}
+            QTabBar::tab:selected {{
+                background-color: {colors.primary};
+                color: {colors.primary_text};
+            }}
+            QTableWidget {{
+                background-color: {colors.surface};
+                color: {colors.text};
+                gridline-color: {colors.border};
+                border: 1px solid {colors.border};
+            }}
+            QHeaderView::section {{
+                background-color: {colors.surface_variant};
+                color: {colors.text};
+                padding: 8px;
+                border: 1px solid {colors.border};
+                font-weight: bold;
+            }}
+            QScrollArea {{
+                background-color: {colors.surface};
+                border: 1px solid {colors.border};
+            }}
+        """)
+    
     def closeEvent(self, event):
         """Clean up when window is closed."""
         # Unregister language change callback
         if hasattr(self, 'language_manager'):
             self.language_manager.unregister_language_change_callback(self.on_language_updated)
+        # Unregister theme change callback  
+        if hasattr(self, 'theme_manager'):
+            self.theme_manager.unregister_theme_change_callback(self.on_theme_updated)
         super().closeEvent(event)

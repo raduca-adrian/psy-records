@@ -10,4 +10,3 @@ __email__ = "support@psychologicalrecords.com"
 
 # Package imports for convenience
 from .core.database import DatabaseManager
-from .utils.language_manager import LanguageManager

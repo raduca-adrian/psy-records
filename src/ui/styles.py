@@ -5,32 +5,159 @@ This module provides reusable style constants and helper functions.
 
 from typing import Dict, Any
 
-# Color palette
+"""
+Centralized styling system for the PyQt6 application.
+This module provides reusable style constants and helper functions.
+"""
+
+from typing import Dict, Any
+from enum import Enum
+
+class ThemeMode(Enum):
+    LIGHT = "light"
+    DARK = "dark"
+
+# Color palette with theme support
 class Colors:
-    # Primary colors
-    PRIMARY = "#0d6efd"
-    PRIMARY_HOVER = "#0b5ed7"
-    PRIMARY_PRESSED = "#0a58ca"
+    # Theme-aware color system
+    _current_theme = ThemeMode.LIGHT
     
-    # Success colors
-    SUCCESS = "#198754"
-    SUCCESS_HOVER = "#157347"
-    SUCCESS_PRESSED = "#146c43"
+    # Light theme colors
+    _LIGHT_COLORS = {
+        # Primary colors
+        'PRIMARY': "#0d6efd",
+        'PRIMARY_HOVER': "#0b5ed7",
+        'PRIMARY_PRESSED': "#0a58ca",
+        
+        # Success colors
+        'SUCCESS': "#198754",
+        'SUCCESS_HOVER': "#157347",
+        'SUCCESS_PRESSED': "#146c43",
+        
+        # Background colors
+        'BACKGROUND': "#f8f9fa",
+        'SURFACE': "#ffffff",
+        'SURFACE_VARIANT': "#e8f4f8",
+        
+        # Text colors
+        'TEXT_PRIMARY': "#212529",
+        'TEXT_SECONDARY': "#495057",
+        'TEXT_MUTED': "#6c757d",
+        
+        # Border colors
+        'BORDER': "#6c757d",
+        'BORDER_LIGHT': "#dee2e6",
+        'BORDER_LIGHTER': "#e9ecef",
+    }
     
-    # Background colors
-    BACKGROUND = "#f8f9fa"
-    SURFACE = "#ffffff"
-    SURFACE_VARIANT = "#e8f4f8"
+    # Dark theme colors
+    _DARK_COLORS = {
+        # Primary colors (slightly adjusted for dark theme)
+        'PRIMARY': "#4dabf7",
+        'PRIMARY_HOVER': "#339af0",
+        'PRIMARY_PRESSED': "#228be6",
+        
+        # Success colors
+        'SUCCESS': "#51cf66",
+        'SUCCESS_HOVER': "#40c057",
+        'SUCCESS_PRESSED': "#37b24d",
+        
+        # Background colors
+        'BACKGROUND': "#1a1a1a",
+        'SURFACE': "#2d2d2d",
+        'SURFACE_VARIANT': "#383838",
+        
+        # Text colors
+        'TEXT_PRIMARY': "#f8f9fa",
+        'TEXT_SECONDARY': "#ced4da",
+        'TEXT_MUTED': "#adb5bd",
+        
+        # Border colors
+        'BORDER': "#495057",
+        'BORDER_LIGHT': "#343a40",
+        'BORDER_LIGHTER': "#495057",
+    }
     
-    # Text colors
-    TEXT_PRIMARY = "#212529"
-    TEXT_SECONDARY = "#495057"
-    TEXT_MUTED = "#6c757d"
+    @classmethod
+    def set_theme(cls, theme: ThemeMode):
+        """Set the current theme"""
+        cls._current_theme = theme
     
-    # Border colors
-    BORDER = "#6c757d"
-    BORDER_LIGHT = "#dee2e6"
-    BORDER_LIGHTER = "#e9ecef"
+    @classmethod
+    def get_theme(cls) -> ThemeMode:
+        """Get the current theme"""
+        return cls._current_theme
+    
+    @classmethod
+    def _get_color(cls, color_name: str) -> str:
+        """Get color value based on current theme"""
+        if cls._current_theme == ThemeMode.DARK:
+            return cls._DARK_COLORS.get(color_name, cls._LIGHT_COLORS.get(color_name, "#000000"))
+        return cls._LIGHT_COLORS.get(color_name, "#000000")
+    
+    # Dynamic color properties
+    @property
+    def PRIMARY(cls) -> str:
+        return cls._get_color('PRIMARY')
+    
+    @property 
+    def PRIMARY_HOVER(cls) -> str:
+        return cls._get_color('PRIMARY_HOVER')
+    
+    @property
+    def PRIMARY_PRESSED(cls) -> str:
+        return cls._get_color('PRIMARY_PRESSED')
+    
+    @property
+    def SUCCESS(cls) -> str:
+        return cls._get_color('SUCCESS')
+    
+    @property
+    def SUCCESS_HOVER(cls) -> str:
+        return cls._get_color('SUCCESS_HOVER')
+    
+    @property
+    def SUCCESS_PRESSED(cls) -> str:
+        return cls._get_color('SUCCESS_PRESSED')
+    
+    @property
+    def BACKGROUND(cls) -> str:
+        return cls._get_color('BACKGROUND')
+    
+    @property
+    def SURFACE(cls) -> str:
+        return cls._get_color('SURFACE')
+    
+    @property
+    def SURFACE_VARIANT(cls) -> str:
+        return cls._get_color('SURFACE_VARIANT')
+    
+    @property
+    def TEXT_PRIMARY(cls) -> str:
+        return cls._get_color('TEXT_PRIMARY')
+    
+    @property
+    def TEXT_SECONDARY(cls) -> str:
+        return cls._get_color('TEXT_SECONDARY')
+    
+    @property
+    def TEXT_MUTED(cls) -> str:
+        return cls._get_color('TEXT_MUTED')
+    
+    @property
+    def BORDER(cls) -> str:
+        return cls._get_color('BORDER')
+    
+    @property
+    def BORDER_LIGHT(cls) -> str:
+        return cls._get_color('BORDER_LIGHT')
+    
+    @property
+    def BORDER_LIGHTER(cls) -> str:
+        return cls._get_color('BORDER_LIGHTER')
+
+# Create a global instance for easy access
+colors = Colors()
 
 # Typography
 class Typography:
@@ -61,65 +188,91 @@ class BorderRadius:
     SM = "0.5em"       # 8px equivalent at 16px base
     MD = "0.625em"     # 10px equivalent at 16px base
 
-# UI Dimensions (relative units) - Reduced sizes
+# UI Dimensions (relative units) - Balanced sizing for usability
 class UIDimensions:
-    # Widget sizes - Reduced to prevent overlap
-    DIALOG_WIDTH_EM = "30em"        # 480px equivalent at 16px base (was 37.5em)
-    DIALOG_HEIGHT_EM = "25em"       # 400px equivalent at 16px base (was 34.375em)
-    COMBO_MAX_WIDTH_EM = "7.5em"    # 120px equivalent at 16px base (was 9.375em)
+    # Widget sizes - Balanced to prevent overlap while maintaining reasonable size
+    DIALOG_WIDTH_EM = "28em"        # 448px equivalent at 16px base - moderate size increase
+    DIALOG_HEIGHT_EM = "22em"       # 352px equivalent at 16px base - reasonable vertical space
+    COMBO_MAX_WIDTH_EM = "7em"      # 112px equivalent at 16px base - adequate for language names
     
-    # Layout spacing - Reduced for compact layout
-    FORM_SPACING_PX = 12            # 0.75em equivalent - using px for QLayout methods
-    FORM_MARGIN_H_PX = 20          # 1.25em equivalent - using px for QLayout methods  
-    FORM_MARGIN_V_PX = 15          # 0.9375em equivalent - using px for QLayout methods
+    # Layout spacing - Balanced for readability without excessive spacing
+    FORM_SPACING_PX = 12            # 0.75em equivalent - good vertical separation
+    FORM_MARGIN_H_PX = 20          # 1.25em equivalent - balanced horizontal margins
+    FORM_MARGIN_V_PX = 15          # 0.9375em equivalent - reasonable vertical margins
+    
+    # Additional spacing constants for consistent layouts
+    BUTTON_SPACING_PX = 8          # Space between buttons
+    SECTION_SPACING_PX = 16        # Space between form sections
+    TAB_CONTENT_PADDING_PX = 12    # Padding inside tab content areas
 
 # Shadows (Qt doesn't support box-shadow, so we'll remove these)
 class Shadows:
     # Note: Qt StyleSheets don't support box-shadow property
     # These values are kept for documentation but not used
-    FOCUS_BORDER = f"0.1875em solid {Colors.PRIMARY}"  # Alternative to box-shadow
+    FOCUS_BORDER = f"0.1875em solid {colors.PRIMARY}"  # Alternative to box-shadow
 
 class StyleSheets:
-    """Pre-defined stylesheet components"""
+    """Pre-defined stylesheet components with theme support"""
     
     @staticmethod
     def dialog() -> str:
         """Base dialog styling"""
         return f"""
             QDialog {{
-                background-color: {Colors.BACKGROUND};
-                color: {Colors.TEXT_PRIMARY};
+                background-color: {colors.BACKGROUND};
+                color: {colors.TEXT_PRIMARY};
                 font-family: {Typography.FONT_FAMILY};
             }}
         """
     
     @staticmethod
     def input_field() -> str:
-        """Standard input field styling with reduced size"""
+        """Standard input field styling with improved visibility"""
         return f"""
             QLineEdit {{
-                padding: 0.625em 0.75em;
-                border: 0.125em solid {Colors.BORDER};
+                padding: 0.75em 1em;
+                border: 0.125em solid {colors.BORDER};
                 border-radius: {BorderRadius.SM};
                 font-size: {Typography.FONT_SIZE_NORMAL};
-                background-color: {Colors.SURFACE};
-                color: {Colors.TEXT_PRIMARY};
-                selection-background-color: {Colors.PRIMARY};
+                background-color: {colors.SURFACE};
+                color: {colors.TEXT_PRIMARY};
+                selection-background-color: {colors.PRIMARY};
                 selection-color: white;
-                min-height: 1.25em;
-                max-height: 2.5em;
+                min-height: 1.5em;
+                max-height: 3em;
                 font-weight: {Typography.FONT_WEIGHT_NORMAL};
-                margin: 0.25em 0em;
+                margin: 0.375em 0em;
             }}
             QLineEdit:focus {{
-                border-color: {Colors.PRIMARY};
+                border-color: {colors.PRIMARY};
                 border-width: 0.1875em;
-                background-color: {Colors.SURFACE};
+                background-color: {colors.SURFACE};
+                outline: none;
             }}
             QLineEdit::placeholder {{
-                color: {Colors.TEXT_MUTED};
+                color: {colors.TEXT_MUTED};
                 font-style: italic;
                 font-weight: {Typography.FONT_WEIGHT_NORMAL};
+            }}
+            QTextEdit {{
+                padding: 0.75em;
+                border: 0.125em solid {colors.BORDER};
+                border-radius: {BorderRadius.SM};
+                font-size: {Typography.FONT_SIZE_NORMAL};
+                background-color: {colors.SURFACE};
+                color: {colors.TEXT_PRIMARY};
+                selection-background-color: {colors.PRIMARY};
+                selection-color: white;
+                min-height: 4em;
+                font-weight: {Typography.FONT_WEIGHT_NORMAL};
+                margin: 0.375em 0em;
+                line-height: 1.4;
+            }}
+            QTextEdit:focus {{
+                border-color: {colors.PRIMARY};
+                border-width: 0.1875em;
+                background-color: {colors.SURFACE};
+                outline: none;
             }}
         """
     
@@ -129,7 +282,7 @@ class StyleSheets:
         return f"""
             QLabel {{
                 font-weight: {Typography.FONT_WEIGHT_BOLD};
-                color: {Colors.TEXT_SECONDARY};
+                color: {colors.TEXT_SECONDARY};
                 font-size: {Typography.FONT_SIZE_NORMAL};
                 padding: 0.25em 0em;
                 margin: 0.125em 0em;
@@ -142,7 +295,7 @@ class StyleSheets:
         """Primary button styling with reduced size and Qt-compatible properties"""
         return f"""
             QPushButton {{
-                background-color: {Colors.PRIMARY};
+                background-color: {colors.PRIMARY};
                 color: white;
                 border: none;
                 padding: 0.5em 1.25em;
@@ -154,10 +307,10 @@ class StyleSheets:
                 text-transform: uppercase;
             }}
             QPushButton:hover {{
-                background-color: {Colors.PRIMARY_HOVER};
+                background-color: {colors.PRIMARY_HOVER};
             }}
             QPushButton:pressed {{
-                background-color: {Colors.PRIMARY_PRESSED};
+                background-color: {colors.PRIMARY_PRESSED};
             }}
         """
     
@@ -173,7 +326,7 @@ class StyleSheets:
         """Success button styling with reduced size and Qt-compatible properties"""
         return f"""
             QPushButton {{
-                background-color: {Colors.SUCCESS};
+                background-color: {colors.SUCCESS};
                 color: white;
                 border: none;
                 padding: 0.5em 1.25em;
@@ -185,10 +338,10 @@ class StyleSheets:
                 text-transform: uppercase;
             }}
             QPushButton:hover {{
-                background-color: {Colors.SUCCESS_HOVER};
+                background-color: {colors.SUCCESS_HOVER};
             }}
             QPushButton:pressed {{
-                background-color: {Colors.SUCCESS_PRESSED};
+                background-color: {colors.SUCCESS_PRESSED};
             }}
         """
     
@@ -198,7 +351,7 @@ class StyleSheets:
         return f"""
             QComboBox {{
                 padding: 0.625em 0.75em;
-                border: 0.125em solid {Colors.BORDER};
+                border: 0.125em solid {colors.BORDER};
                 border-radius: {BorderRadius.SM};
                 font-size: {Typography.FONT_SIZE_NORMAL};
                 background-color: {Colors.SURFACE};
@@ -267,26 +420,26 @@ class StyleSheets:
     
     @staticmethod
     def tab_widget() -> str:
-        """Tab widget styling with reduced size"""
+        """Tab widget styling with improved spacing and visibility"""
         return f"""
             QTabWidget::pane {{
                 border: 0.125em solid {Colors.BORDER_LIGHT};
                 background-color: {Colors.SURFACE};
                 border-radius: {BorderRadius.SM};
-                margin-top: 0.5em;
-                padding: 0.75em;
+                margin-top: 0.625em;
+                padding: 1em;
             }}
             QTabBar::tab {{
                 background-color: {Colors.BORDER_LIGHTER};
-                padding: 0.625em 1.25em;
-                margin-right: 0.1875em;
+                padding: 0.75em 1.5em;
+                margin-right: 0.25em;
                 border-top-left-radius: {BorderRadius.SM};
                 border-top-right-radius: {BorderRadius.SM};
                 color: {Colors.TEXT_SECONDARY};
                 font-weight: {Typography.FONT_WEIGHT_BOLD};
                 font-size: 0.875em;
-                min-width: 5em;
-                min-height: 1em;
+                min-width: 6em;
+                min-height: 1.25em;
             }}
             QTabBar::tab:selected {{
                 background-color: {Colors.SURFACE};
@@ -298,6 +451,13 @@ class StyleSheets:
             QTabBar::tab:hover {{
                 background-color: {Colors.BORDER_LIGHT};
                 color: {Colors.TEXT_PRIMARY};
+            }}
+            QTabWidget QScrollArea {{
+                border: none;
+                background-color: {Colors.SURFACE};
+            }}
+            QTabWidget QScrollArea QWidget {{
+                background-color: {Colors.SURFACE};
             }}
         """
     
@@ -393,11 +553,31 @@ class WidgetStyles:
     
     @staticmethod
     def apply_dialog_dimensions(dialog):
-        """Apply standardized dialog dimensions - Reduced size"""
+        """Apply standardized dialog dimensions - Optimized for visibility"""
         # Note: setFixedSize requires pixel values, but we document the em equivalent
-        dialog.setFixedSize(480, 400)  # Equivalent to 30em x 25em at 16px base
+        dialog.setFixedSize(512, 416)  # Equivalent to 32em x 26em at 16px base - improved size
     
     @staticmethod
     def apply_combo_sizing(combo):
-        """Apply standardized combo box sizing - Reduced size"""
-        combo.setMaximumWidth(120)  # Equivalent to 7.5em at 16px base
+        """Apply standardized combo box sizing - Improved for longer text"""
+        combo.setMaximumWidth(128)  # Equivalent to 8em at 16px base - better for language names
+        
+    @staticmethod
+    def apply_section_spacing(layout):
+        """Apply spacing between major sections"""
+        layout.setSpacing(UIDimensions.SECTION_SPACING_PX)
+        
+    @staticmethod
+    def apply_button_layout(layout):
+        """Apply consistent spacing for button layouts"""
+        layout.setSpacing(UIDimensions.BUTTON_SPACING_PX)
+        
+    @staticmethod
+    def apply_tab_content_padding(widget):
+        """Apply consistent padding to tab content areas"""
+        widget.setContentsMargins(
+            UIDimensions.TAB_CONTENT_PADDING_PX,
+            UIDimensions.TAB_CONTENT_PADDING_PX,
+            UIDimensions.TAB_CONTENT_PADDING_PX,
+            UIDimensions.TAB_CONTENT_PADDING_PX
+        )
