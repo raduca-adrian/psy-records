@@ -1,5 +1,6 @@
 PyQt6==6.7.1
 cryptography==45.0.0
 bcrypt==4.2.1
+reportlab==4.2.5
 pyinstaller==6.11.1
 cx-Freeze==7.2.4

@@ -700,7 +700,7 @@ class MedicalRecordsWindow(QMainWindow):
         """Toggle between light and dark theme."""
         current_theme = self.theme_manager.get_current_theme()
         new_theme = ThemeMode.DARK if current_theme == ThemeMode.LIGHT else ThemeMode.LIGHT
-        self.theme_manager.set_theme(new_theme)
+        self.theme_manager.change_theme(new_theme)
     
     def on_theme_updated(self, theme_mode: ThemeMode):
         """Called when theme is changed from anywhere in the application."""

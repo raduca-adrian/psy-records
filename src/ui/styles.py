@@ -155,6 +155,50 @@ class Colors:
     @property
     def BORDER_LIGHTER(cls) -> str:
         return cls._get_color('BORDER_LIGHTER')
+    
+    # Lowercase aliases for convenience
+    @property
+    def background(cls) -> str:
+        return cls._get_color('BACKGROUND')
+    
+    @property 
+    def text(cls) -> str:
+        return cls._get_color('TEXT_PRIMARY')
+    
+    @property
+    def card_background(cls) -> str:
+        return cls._get_color('SURFACE')
+    
+    @property
+    def border(cls) -> str:
+        return cls._get_color('BORDER')
+    
+    @property
+    def primary(cls) -> str:
+        return cls._get_color('PRIMARY')
+    
+    @property
+    def primary_text(cls) -> str:
+        # For text on primary background - should be white/light
+        if cls._current_theme == ThemeMode.DARK:
+            return cls._get_color('TEXT_PRIMARY')  # Light text in dark theme
+        return "#ffffff"  # White text on primary background in light theme
+    
+    @property
+    def primary_hover(cls) -> str:
+        return cls._get_color('PRIMARY_HOVER')
+    
+    @property
+    def primary_pressed(cls) -> str:
+        return cls._get_color('PRIMARY_PRESSED')
+    
+    @property
+    def surface(cls) -> str:
+        return cls._get_color('SURFACE')
+    
+    @property
+    def surface_variant(cls) -> str:
+        return cls._get_color('SURFACE_VARIANT')
 
 # Create a global instance for easy access
 colors = Colors()
