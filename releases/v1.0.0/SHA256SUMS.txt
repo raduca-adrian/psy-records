@@ -1,0 +1,14 @@
+# SHA256 Checksums for Psychological Records v1.0.0
+
+## Portable Distribution (PyInstaller)
+4C8B3D2E7ED395CB6122C5D4303C04DAFCBAA72110ED0264ECC95E89ED968B8B  PsychologicalRecords-v1.0.0-Portable.zip
+
+## Installer Distribution (cx_Freeze)
+3E1B917EC3253761D662A7EF8A69AD9C2B83B52BFE44ACA2F07DAEC9FE50E6EC  PsychologicalRecords-v1.0.0-Installer.zip
+
+## Verification Instructions
+To verify the integrity of your download:
+1. Download the file and this checksum file
+2. Open PowerShell in the download directory
+3. Run: Get-FileHash -Path "filename.zip" -Algorithm SHA256
+4. Compare the output hash with the corresponding hash above

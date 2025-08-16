@@ -1,0 +1,40 @@
+SOFTWARE LICENSE AGREEMENT
+Psychological Records Management System v1.0.0
+
+Copyright (c) 2025 Medical Software Solutions. All rights reserved.
+
+IMPORTANT - READ CAREFULLY:
+
+This Software License Agreement ("Agreement") is a legal agreement between you (either an individual or a single entity) and Medical Software Solutions for the Psychological Records Management System software product ("Software").
+
+BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT.
+
+1. GRANT OF LICENSE
+Subject to the terms of this Agreement, Medical Software Solutions grants you a non-exclusive, non-transferable license to use the Software for medical and psychological practice purposes.
+
+2. RESTRICTIONS
+You may not:
+- Distribute copies of the Software
+- Reverse engineer, decompile, or disassemble the Software
+- Remove or modify any copyright notices
+- Use the Software for any unlawful purpose
+
+3. DATA PROTECTION
+The Software is designed to handle sensitive medical information. You are responsible for:
+- Ensuring compliance with applicable privacy laws (HIPAA, GDPR, etc.)
+- Implementing appropriate security measures
+- Creating regular backups of patient data
+
+4. WARRANTY DISCLAIMER
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. MEDICAL SOFTWARE SOLUTIONS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+5. LIMITATION OF LIABILITY
+IN NO EVENT SHALL MEDICAL SOFTWARE SOLUTIONS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE.
+
+6. TERMINATION
+This license is effective until terminated. You may terminate it at any time by uninstalling the Software. This license will terminate automatically if you fail to comply with any term of this Agreement.
+
+7. GOVERNING LAW
+This Agreement shall be governed by the laws of the jurisdiction in which Medical Software Solutions is located.
+
+By clicking "I Agree" below, you acknowledge that you have read this Agreement, understand it, and agree to be bound by its terms and conditions.
