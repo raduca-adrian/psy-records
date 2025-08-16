@@ -258,15 +258,20 @@ class MedicalRecordsWindow(QMainWindow):
         
         # Set column widths
         header = self.assessments_table.horizontalHeader()
+        header.setVisible(True)  # Ensure headers are visible
+        header.setMinimumHeight(40)  # Set minimum height for visibility
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)  # Date
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)  # Chief Complaint
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)  # Diagnosis
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)  # Treatment Plan
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)  # Created
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)  # Actions
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)  # Actions
+        header.resizeSection(5, 180)  # Set fixed width for Actions column
         
         self.assessments_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.assessments_table.setAlternatingRowColors(True)
+        self.assessments_table.verticalHeader().setDefaultSectionSize(50)  # Set row height for buttons
+        self.assessments_table.verticalHeader().setVisible(False)  # Hide row numbers
         
         layout.addWidget(self.assessments_table)
     
@@ -289,16 +294,21 @@ class MedicalRecordsWindow(QMainWindow):
         
         # Set column widths
         header = self.consultations_table.horizontalHeader()
+        header.setVisible(True)  # Ensure headers are visible
+        header.setMinimumHeight(40)  # Set minimum height for visibility
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)  # Date
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)  # Type
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)  # Symptoms
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)  # Findings
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)  # Recommendations
         header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)  # Next Appt
-        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)  # Actions
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)  # Actions
+        header.resizeSection(6, 180)  # Set fixed width for Actions column
         
         self.consultations_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.consultations_table.setAlternatingRowColors(True)
+        self.consultations_table.verticalHeader().setDefaultSectionSize(50)  # Set row height for buttons
+        self.consultations_table.verticalHeader().setVisible(False)  # Hide row numbers
         
         layout.addWidget(self.consultations_table)
     
@@ -338,22 +348,31 @@ class MedicalRecordsWindow(QMainWindow):
             # Action buttons
             actions_widget = QWidget()
             actions_layout = QHBoxLayout(actions_widget)
-            actions_layout.setContentsMargins(4, 4, 4, 4)
+            actions_layout.setContentsMargins(8, 4, 8, 4)
+            actions_layout.setSpacing(6)
             
             edit_btn = QPushButton(f"✏️ {self.get_text('common.edit')}")
             edit_btn.setStyleSheet("""
                 QPushButton { 
-                    min-width: 60px; 
-                    padding: 6px 12px; 
-                    font-size: 11px;
-                    background-color: #0d6efd;
-                    color: white;
-                    border-radius: 4px;
+                    min-width: 70px; 
+                    max-width: 80px;
+                    padding: 8px 12px; 
+                    font-size: 12px;
+                    background-color: #0d6efd !important;
+                    color: white !important;
+                    border: 2px solid #0d6efd !important;
+                    border-radius: 6px;
                     font-weight: 600;
-                    margin: 1px;
+                    margin: 2px;
                 }
                 QPushButton:hover {
-                    background-color: #0b5ed7;
+                    background-color: #0b5ed7 !important;
+                    border-color: #0b5ed7 !important;
+                    transform: translateY(-1px);
+                }
+                QPushButton:pressed {
+                    background-color: #0a58ca !important;
+                    border-color: #0a58ca !important;
                 }
             """)
             edit_btn.clicked.connect(lambda checked, aid=assessment_id, data=assessment: self.edit_assessment(aid, data))
@@ -361,17 +380,25 @@ class MedicalRecordsWindow(QMainWindow):
             delete_btn = QPushButton(f"🗑️ {self.get_text('common.delete')}")
             delete_btn.setStyleSheet("""
                 QPushButton { 
-                    min-width: 60px; 
-                    padding: 6px 12px; 
-                    font-size: 11px; 
-                    background-color: #dc3545;
-                    color: white;
-                    border-radius: 4px;
+                    min-width: 70px; 
+                    max-width: 80px;
+                    padding: 8px 12px; 
+                    font-size: 12px; 
+                    background-color: #dc3545 !important;
+                    color: white !important;
+                    border: 2px solid #dc3545 !important;
+                    border-radius: 6px;
                     font-weight: 600;
-                    margin: 1px;
+                    margin: 2px;
                 }
                 QPushButton:hover {
-                    background-color: #bb2d3b;
+                    background-color: #bb2d3b !important;
+                    border-color: #bb2d3b !important;
+                    transform: translateY(-1px);
+                }
+                QPushButton:pressed {
+                    background-color: #b02a37 !important;
+                    border-color: #b02a37 !important;
                 }
             """)
             delete_btn.clicked.connect(lambda checked, aid=assessment_id: self.delete_assessment(aid))
@@ -415,22 +442,31 @@ class MedicalRecordsWindow(QMainWindow):
             # Action buttons
             actions_widget = QWidget()
             actions_layout = QHBoxLayout(actions_widget)
-            actions_layout.setContentsMargins(4, 4, 4, 4)
+            actions_layout.setContentsMargins(8, 4, 8, 4)
+            actions_layout.setSpacing(6)
             
             edit_btn = QPushButton(f"✏️ {self.get_text('common.edit')}")
             edit_btn.setStyleSheet("""
                 QPushButton { 
-                    min-width: 60px; 
-                    padding: 6px 12px; 
-                    font-size: 11px;
-                    background-color: #0d6efd;
-                    color: white;
-                    border-radius: 4px;
+                    min-width: 70px; 
+                    max-width: 80px;
+                    padding: 8px 12px; 
+                    font-size: 12px;
+                    background-color: #0d6efd !important;
+                    color: white !important;
+                    border: 2px solid #0d6efd !important;
+                    border-radius: 6px;
                     font-weight: 600;
-                    margin: 1px;
+                    margin: 2px;
                 }
                 QPushButton:hover {
-                    background-color: #0b5ed7;
+                    background-color: #0b5ed7 !important;
+                    border-color: #0b5ed7 !important;
+                    transform: translateY(-1px);
+                }
+                QPushButton:pressed {
+                    background-color: #0a58ca !important;
+                    border-color: #0a58ca !important;
                 }
             """)
             edit_btn.clicked.connect(lambda checked, cid=consultation_id, data=consultation: self.edit_consultation(cid, data))
@@ -438,17 +474,25 @@ class MedicalRecordsWindow(QMainWindow):
             delete_btn = QPushButton(f"🗑️ {self.get_text('common.delete')}")
             delete_btn.setStyleSheet("""
                 QPushButton { 
-                    min-width: 60px; 
-                    padding: 6px 12px; 
-                    font-size: 11px; 
-                    background-color: #dc3545;
-                    color: white;
-                    border-radius: 4px;
+                    min-width: 70px; 
+                    max-width: 80px;
+                    padding: 8px 12px; 
+                    font-size: 12px; 
+                    background-color: #dc3545 !important;
+                    color: white !important;
+                    border: 2px solid #dc3545 !important;
+                    border-radius: 6px;
                     font-weight: 600;
-                    margin: 1px;
+                    margin: 2px;
                 }
                 QPushButton:hover {
-                    background-color: #bb2d3b;
+                    background-color: #bb2d3b !important;
+                    border-color: #bb2d3b !important;
+                    transform: translateY(-1px);
+                }
+                QPushButton:pressed {
+                    background-color: #b02a37 !important;
+                    border-color: #b02a37 !important;
                 }
             """)
             delete_btn.clicked.connect(lambda checked, cid=consultation_id: self.delete_consultation(cid))
@@ -788,12 +832,38 @@ class MedicalRecordsWindow(QMainWindow):
                 gridline-color: {colors.border};
                 border: 1px solid {colors.border};
             }}
+            QTableWidget QWidget {{
+                background-color: transparent;
+            }}
+            QTableWidget QWidget QPushButton {{
+                background-color: #0d6efd;
+                color: white;
+                border: 2px solid #0d6efd;
+                border-radius: 6px;
+                font-weight: 600;
+                min-width: 70px;
+                padding: 8px 12px;
+            }}
+            QTableWidget QWidget QPushButton:hover {{
+                background-color: #0b5ed7;
+                border-color: #0b5ed7;
+            }}
             QHeaderView::section {{
-                background-color: {colors.surface_variant};
-                color: {colors.text};
-                padding: 8px;
-                border: 1px solid {colors.border};
-                font-weight: bold;
+                background-color: {colors.primary};
+                color: white;
+                padding: 12px 8px;
+                border: none;
+                border-right: 1px solid {colors.border};
+                font-weight: 700;
+                font-size: 14px;
+                min-height: 40px;
+                text-align: center;
+            }}
+            QHeaderView::section:hover {{
+                background-color: {colors.primary_hover};
+            }}
+            QHeaderView::section:pressed {{
+                background-color: {colors.primary_pressed};
             }}
             QScrollArea {{
                 background-color: {colors.surface};

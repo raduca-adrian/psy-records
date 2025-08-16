@@ -307,6 +307,8 @@ class MainWindow(QMainWindow):
         
         # Set column widths
         header = self.table.horizontalHeader()
+        header.setVisible(True)  # Ensure headers are visible
+        header.setMinimumHeight(40)  # Set minimum height for visibility
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
