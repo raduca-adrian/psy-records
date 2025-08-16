@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
                             QPushButton, QTableWidget, QTableWidgetItem, 
                             QMessageBox, QLabel, QHeaderView, QMenuBar, 
                             QMenu, QStatusBar, QToolBar, QLineEdit, QDialog,
-                            QFrame, QSplitter, QScrollArea, QGridLayout)
+                            QFrame, QSplitter, QScrollArea, QGridLayout,
+                            QSizePolicy)
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QFont, QResizeEvent
 
@@ -144,7 +145,7 @@ class ModernMainWindow(QMainWindow):
         
         # Add stretch
         spacer = QWidget()
-        spacer.setSizePolicy(QWidget.SizePolicy.Policy.Expanding, QWidget.SizePolicy.Policy.Preferred)
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         toolbar.addWidget(spacer)
         
         # User info
