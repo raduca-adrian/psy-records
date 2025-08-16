@@ -13,7 +13,8 @@ from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QFont, QResizeEvent
 
 from src.ui.responsive_layout import (ResponsiveWidget, FlexibleLayout, 
-                                    ResponsiveBreakpoints, LayoutUtils)
+                                    ResponsiveBreakpoints, LayoutUtils,
+                                    GridResponsiveWidget, FlexGridLayout)
 from src.ui.modern_qss import get_style_manager
 from src.ui.person_dialog import PersonDialog
 from src.ui.change_password_dialog import ChangePasswordDialog
@@ -265,69 +266,190 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.layout_mode_changed.connect(self.on_layout_mode_changed)
     
     def init_ui(self):
-        """Initialize the user interface."""
-        # Main layout
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(16, 16, 16, 16)
-        self.main_layout.setSpacing(16)
+        """Initialize the user interface with grid-based layout."""
+        # Main grid layout for better organization
+        self.main_grid = FlexGridLayout(self)
+        self.main_grid.set_auto_columns(True, max_columns=3)
         
-        # Create header
-        self.create_header()
+        # Create main content sections
+        self.create_header_section()
+        self.create_search_section()
+        self.create_content_section()
+        self.create_actions_section()
         
-        # Create content area
-        self.create_content_area()
-        
-        # Create action buttons
-        self.create_action_buttons()
+        # Apply responsive grid properties
+        self._configure_grid_layout()
     
-    def create_header(self):
-        """Create the header section."""
+    def create_header_section(self):
+        """Create the header section with title and user info."""
+        header_container = QWidget()
+        header_layout = QVBoxLayout(header_container)
+        header_layout.setContentsMargins(0, 0, 0, 0)
+        header_layout.setSpacing(8)
+        
         # Title
         self.title_label = QLabel(self.get_text('main_window.title'))
         self.title_label.setProperty("class", "title")
-        
-        # Search section
-        self.search_container = QWidget()
-        search_layout = QHBoxLayout(self.search_container)
-        search_layout.setContentsMargins(0, 0, 0, 0)
-        
-        search_label = QLabel(f"🔍 {self.get_text('main_window.search')}:")
-        search_label.setProperty("class", "caption")
-        
-        self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
-        self.search_input.textChanged.connect(self.filter_persons)
-        
-        search_layout.addWidget(search_label)
-        search_layout.addWidget(self.search_input)
-        search_layout.addStretch()
+        header_layout.addWidget(self.title_label)
         
         # User info
-        self.user_info = QLabel(f"👤 {self.get_text('main_window.logged_in_as')}: {self.username}")
-        self.user_info.setProperty("class", "subtitle")
+        self.user_label = QLabel(f"{self.get_text('main_window.logged_in_as')}: {self.username}")
+        self.user_label.setProperty("class", "subtitle")
+        header_layout.addWidget(self.user_label)
         
-        # Create responsive header
-        self.header_frame = FlexibleLayout.create_header_layout(
-            self.title_label, 
-            [self.search_container, self.user_info],
-            responsive=True
+        # Add to grid with flex properties
+        self.main_grid.add_flex_item(
+            header_container, 
+            flex_grow=2.0, 
+            flex_basis=300,
+            align_h="stretch",
+            align_v="top"
         )
-        
-        self.main_layout.addWidget(self.header_frame)
     
-    def create_content_area(self):
-        """Create the main content area with table."""
-        # Content frame
-        self.content_frame = QFrame()
-        self.content_frame.setProperty("class", "card")
-        content_layout = QVBoxLayout(self.content_frame)
+    def create_search_section(self):
+        """Create the search and filter section."""
+        search_container = QWidget()
+        search_layout = QVBoxLayout(search_container)
+        search_layout.setContentsMargins(0, 0, 0, 0)
+        search_layout.setSpacing(8)
+        
+        # Search label
+        search_label = QLabel(self.get_text('main_window.search'))
+        search_label.setProperty("class", "label")
+        search_layout.addWidget(search_label)
+        
+        # Search input
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
+        self.search_input.textChanged.connect(self.filter_table)
+        self.search_input.setProperty("class", "search")
+        search_layout.addWidget(self.search_input)
+        
+        # Add to grid
+        self.main_grid.add_flex_item(
+            search_container,
+            flex_grow=1.0,
+            flex_basis=250,
+            align_h="stretch",
+            align_v="top"
+        )
+    
+    def create_content_section(self):
+        """Create the main content table section."""
+        content_container = QWidget()
+        content_layout = QVBoxLayout(content_container)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(8)
         
         # Table
         self.table = QTableWidget()
         self.setup_table()
-        
         content_layout.addWidget(self.table)
-        self.main_layout.addWidget(self.content_frame)
+        
+        # Add to grid - table takes most space
+        self.main_grid.add_flex_item(
+            content_container,
+            flex_grow=3.0,
+            flex_basis=500,
+            align_h="stretch",
+            align_v="stretch"
+        )
+    
+    def create_actions_section(self):
+        """Create the action buttons section."""
+        actions_container = GridResponsiveWidget()
+        actions_container.set_column_configuration({
+            "xs": 1,  # Single column on mobile
+            "sm": 2,  # Two columns on small tablets
+            "md": 3,  # Three columns on tablets
+            "lg": 4,  # Four columns on desktop
+            "xl": 5   # Five columns on large screens
+        })
+        
+        # Create action buttons
+        self.create_action_buttons(actions_container)
+        
+        # Add to main grid
+        self.main_grid.add_flex_item(
+            actions_container,
+            flex_grow=1.0,
+            flex_basis=400,
+            align_h="stretch",
+            align_v="center"
+        )
+    
+    def create_action_buttons(self, container):
+        """Create action buttons with proper grid alignment."""
+        # Add Person button
+        self.add_person_btn = QPushButton(f"👤 {self.get_text('main_window.add_person')}")
+        self.add_person_btn.setProperty("class", "success")
+        self.add_person_btn.clicked.connect(self.add_person)
+        container.add_grid_item(self.add_person_btn, weight=1, min_width=150, preferred_width=200)
+        
+        # Edit Person button
+        self.edit_person_btn = QPushButton(f"✏️ {self.get_text('main_window.edit_person')}")
+        self.edit_person_btn.clicked.connect(self.edit_person)
+        container.add_grid_item(self.edit_person_btn, weight=1, min_width=150, preferred_width=200)
+        
+        # Delete Person button
+        self.delete_person_btn = QPushButton(f"🗑️ {self.get_text('main_window.delete_person')}")
+        self.delete_person_btn.setProperty("class", "danger")
+        self.delete_person_btn.clicked.connect(self.delete_person)
+        container.add_grid_item(self.delete_person_btn, weight=1, min_width=150, preferred_width=200)
+        
+        # View Records button
+        self.view_records_btn = QPushButton(f"📋 {self.get_text('main_window.view_records')}")
+        self.view_records_btn.setProperty("class", "primary")
+        self.view_records_btn.clicked.connect(self.view_medical_records)
+        container.add_grid_item(self.view_records_btn, weight=1, min_width=150, preferred_width=200)
+        
+        # Theme Toggle button
+        self.theme_toggle_btn = QPushButton()
+        self.theme_toggle_btn.setProperty("class", "icon")
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
+        self.update_theme_button()
+        container.add_grid_item(self.theme_toggle_btn, weight=1, min_width=60, preferred_width=80)
+    
+    def _configure_grid_layout(self):
+        """Configure the main grid layout properties."""
+        # Set column weights for balanced layout
+        self.main_grid.set_column_weights({
+            0: 1.5,  # Header and search get more weight
+            1: 2.0,  # Content gets most weight
+            2: 1.0   # Actions get standard weight
+        })
+        
+        # Configure responsive spacing
+        self.main_grid.setSpacing(16)
+        self.main_grid.setContentsMargins(16, 16, 16, 16)
+    
+    def setup_table(self):
+        """Setup the persons table with proper grid alignment."""
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels([
+            self.get_text("main_window.name"), 
+            self.get_text("main_window.cnp"), 
+            self.get_text("main_window.phone"), 
+            self.get_text("main_window.created")
+        ])
+        
+        # Configure header for better visibility
+        header = self.table.horizontalHeader()
+        header.setVisible(True)
+        header.setMinimumHeight(40)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        
+        # Table properties
+        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setAlternatingRowColors(True)
+        self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(50)
+        
+        # Connect selection signal
+        self.table.itemSelectionChanged.connect(self.on_person_selected)
     
     def setup_table(self):
         """Setup the persons table."""
