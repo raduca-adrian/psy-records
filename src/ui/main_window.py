@@ -773,10 +773,10 @@ class MainWindow(QMainWindow):
         person_data = self.get_selected_person()
         if person_data:
             # Import here to avoid circular imports
-            from src.ui.medical_records_window import MedicalRecordsWindow
+            from src.ui.modern_medical_records_window import ModernMedicalRecordsWindow
             
             # Create and show psychological records window
-            records_window = MedicalRecordsWindow(person_data, self.db_manager, self)
+            records_window = ModernMedicalRecordsWindow(person_data, self.db_manager, self)
             records_window.show()
         else:
             QMessageBox.warning(self, self.get_text('common.warning'), self.get_text('main_window.select_person_records'))

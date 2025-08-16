@@ -228,12 +228,10 @@ class ModernQSS:
         
         QPushButton:hover {{
             background-color: {colors['accent_hover']};
-            transform: translateY(-1px);
         }}
         
         QPushButton:pressed {{
             background-color: {colors['accent_pressed']};
-            transform: translateY(0px);
         }}
         
         QPushButton:disabled {{

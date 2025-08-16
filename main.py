@@ -16,7 +16,9 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from src.core.database import DatabaseManager
 from src.ui.login_dialog import LoginDialog
-from src.ui.main_window import MainWindow
+from src.ui.modern_main_window import ModernMainWindow
+from src.utils.theme_manager import get_theme_manager
+from src.ui.modern_qss import get_style_manager
 
 
 def ensure_encrypted_database_only() -> None:
@@ -55,11 +57,15 @@ class SecureApplication:
         # Set application icon (create a simple programmatic icon)
         self.create_app_icon()
 
-        # Set global style
-        self.set_global_style()
+        # Initialize theme and style managers
+        self.theme_manager = get_theme_manager()
+        self.style_manager = get_style_manager()
+        
+        # Set modern global style
+        self.set_modern_global_style()
 
         self.db_manager: Optional[DatabaseManager] = None
-        self.main_window: Optional[MainWindow] = None
+        self.main_window: Optional[ModernMainWindow] = None
 
     def create_app_icon(self) -> None:
         """Create a simple application icon programmatically."""
@@ -102,38 +108,16 @@ class SecureApplication:
         icon = QIcon(pixmap)
         self.app.setWindowIcon(icon)
 
-    def set_global_style(self) -> None:
-        """Set global application style."""
-        style = """
-        QApplication {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 10pt;
-        }
+    def set_modern_global_style(self) -> None:
+        """Set modern global application style using the style manager."""
+        # Apply the modern stylesheet
+        stylesheet = self.style_manager.get_current_stylesheet()
+        self.app.setStyleSheet(stylesheet)
         
-        QMessageBox {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-        }
-        
-        QMessageBox QPushButton {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            font-weight: bold;
-            min-width: 80px;
-        }
-        
-        QMessageBox QPushButton:hover {
-            background-color: #2980b9;
-        }
-        
-        QMessageBox QPushButton:pressed {
-            background-color: #21618c;
-        }
-        """
-        self.app.setStyleSheet(style)
+        # Connect to style changes for dynamic updates
+        self.style_manager.style_changed.connect(
+            lambda: self.app.setStyleSheet(self.style_manager.get_current_stylesheet())
+        )
 
     def run(self) -> int:
         """Run the application."""
@@ -144,7 +128,7 @@ class SecureApplication:
             def on_login_success(username: str) -> None:
                 """Handle successful login."""
                 self.db_manager = login_dialog.get_database_manager()
-                self.main_window = MainWindow(self.db_manager, username)
+                self.main_window = ModernMainWindow(self.db_manager, username)
                 self.main_window.show()
 
             login_dialog.login_successful.connect(on_login_success)

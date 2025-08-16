@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
                             QMessageBox, QLabel, QHeaderView, QMenuBar, 
                             QMenu, QStatusBar, QToolBar, QLineEdit, QDialog,
                             QFrame, QSplitter, QScrollArea, QGridLayout)
-from PyQt6.QtCore import Qt, QTimer, QSize
+from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QFont, QResizeEvent
 
 from src.ui.responsive_layout import (ResponsiveWidget, FlexibleLayout, 
@@ -537,8 +537,8 @@ class ResponsiveMainWidget(ResponsiveWidget):
         """View medical records for selected person."""
         person_data = self.get_selected_person()
         if person_data:
-            from src.ui.medical_records_window import MedicalRecordsWindow
-            self.medical_window = MedicalRecordsWindow(person_data, self.db_manager, self)
+            from src.ui.modern_medical_records_window import ModernMedicalRecordsWindow
+            self.medical_window = ModernMedicalRecordsWindow(person_data, self.db_manager, self)
             self.medical_window.show()
     
     def on_layout_mode_changed(self, mode):
