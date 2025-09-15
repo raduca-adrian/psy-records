@@ -6,7 +6,7 @@ Handles language persistence, loading, and application-wide updates.
 import os
 import json
 from typing import Optional, Callable, List
-from src.utils.app_translator import get_translator, set_language, get_available_locales
+from .app_translator import get_translator, set_language, get_available_locales
 
 class LanguageManager:
     """Manages language settings across the entire application"""
@@ -116,5 +116,5 @@ def get_language_manager() -> LanguageManager:
 
 def get_text(key: str, default: str = None) -> str:
     """Convenience function to get translated text."""
-    from src.utils.app_translator import get_text as translator_get_text
+    from .app_translator import get_text as translator_get_text
     return translator_get_text(key, default or key)

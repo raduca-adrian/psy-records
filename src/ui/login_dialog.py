@@ -4,10 +4,10 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                             QWidget, QFormLayout, QCheckBox, QComboBox)
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon, QFont
-from src.core.database import DatabaseManager
-from src.ui.layout_helpers import LayoutManager
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
-from src.ui.styles import WidgetStyles, StyleHelper
+from ..core.database import DatabaseManager
+from .layout_helpers import LayoutManager
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
+from .styles import WidgetStyles, StyleHelper
 import os
 import json
 

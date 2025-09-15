@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
                             QMessageBox, QScrollArea, QWidget, QComboBox)
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
 
 class ConsultationDialog(QDialog):
     def __init__(self, person_name, person_id, consultation_data=None, parent=None):

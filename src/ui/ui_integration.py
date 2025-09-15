@@ -14,13 +14,13 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 sys.path.insert(0, project_root)
 
 try:
-    from src.ui.modern_main_window import ModernMainWindow
-    from src.ui.modern_medical_records_window import ModernMedicalRecordsWindow
-    from src.ui.main_window import MainWindow
-    from src.ui.medical_records_window import MedicalRecordsWindow
-    from src.core.database import DatabaseManager
-    from src.utils.language_manager import get_language_manager
-    from src.utils.theme_manager import get_theme_manager, ThemeMode
+    from .modern_main_window import ModernMainWindow
+    from .modern_medical_records_window import ModernMedicalRecordsWindow
+    from .main_window import MainWindow
+    from .medical_records_window import MedicalRecordsWindow
+    from ..core.database import DatabaseManager
+    from ..utils.language_manager import get_language_manager
+    from ..utils.theme_manager import get_theme_manager, ThemeMode
 except ImportError as e:
     print(f"Import error: {e}")
     print("Make sure you're running from the project root directory")
@@ -286,7 +286,7 @@ Try interacting with the interface to see these features in action!
     def test_responsive_behavior(self):
         """Test responsive behavior of modern UI."""
         try:
-            from src.ui.responsive_layout import ResponsiveBreakpoints
+            from .responsive_layout import ResponsiveBreakpoints
             
             # Test breakpoint detection
             xs_class = ResponsiveBreakpoints.get_size_class(400)

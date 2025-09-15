@@ -5,10 +5,10 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
                             QMenu, QStatusBar, QToolBar, QLineEdit, QDialog)
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon, QFont
-from src.ui.person_dialog import PersonDialog
-from src.ui.change_password_dialog import ChangePasswordDialog
-from src.utils.app_translator import get_text
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
+from .person_dialog import PersonDialog
+from .change_password_dialog import ChangePasswordDialog
+from ..utils.app_translator import get_text
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
 from datetime import datetime
 
 class MainWindow(QMainWindow):
@@ -773,7 +773,7 @@ class MainWindow(QMainWindow):
         person_data = self.get_selected_person()
         if person_data:
             # Import here to avoid circular imports
-            from src.ui.modern_medical_records_window import ModernMedicalRecordsWindow
+            from .modern_medical_records_window import ModernMedicalRecordsWindow
             
             # Create and show psychological records window
             records_window = ModernMedicalRecordsWindow(person_data, self.db_manager, self)

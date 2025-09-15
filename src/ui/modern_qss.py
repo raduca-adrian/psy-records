@@ -5,7 +5,7 @@ Provides responsive design, modern styling, and consistent theming.
 
 from PyQt6.QtCore import QObject, pyqtSignal, QSize
 from PyQt6.QtWidgets import QApplication
-from src.utils.theme_manager import get_theme_manager, ThemeMode
+from ..utils.theme_manager import get_theme_manager, ThemeMode
 import os
 
 class ResponsiveStyleManager(QObject):

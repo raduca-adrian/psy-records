@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QFormLayout, QLineEdit,
                             QPushButton, QMessageBox, QLabel, QHBoxLayout)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
 import re
 
 class PersonDialog(QDialog):

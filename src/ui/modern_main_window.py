@@ -12,15 +12,15 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QFont, QResizeEvent
 
-from src.ui.responsive_layout import (ResponsiveWidget, FlexibleLayout, 
+from .responsive_layout import (ResponsiveWidget, FlexibleLayout, 
                                     ResponsiveBreakpoints, LayoutUtils,
                                     GridResponsiveWidget, FlexGridLayout)
-from src.ui.modern_qss import get_style_manager
-from src.ui.person_dialog import PersonDialog
-from src.ui.change_password_dialog import ChangePasswordDialog
-from src.utils.app_translator import get_text
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
-from src.utils.theme_manager import get_theme_manager, ThemeMode
+from .modern_qss import get_style_manager
+from .person_dialog import PersonDialog
+from .change_password_dialog import ChangePasswordDialog
+from ..utils.app_translator import get_text
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
+from ..utils.theme_manager import get_theme_manager, ThemeMode
 from datetime import datetime
 
 class ModernMainWindow(QMainWindow):
@@ -660,7 +660,7 @@ class ResponsiveMainWidget(ResponsiveWidget):
         """View medical records for selected person."""
         person_data = self.get_selected_person()
         if person_data:
-            from src.ui.modern_medical_records_window import ModernMedicalRecordsWindow
+            from .modern_medical_records_window import ModernMedicalRecordsWindow
             self.medical_window = ModernMedicalRecordsWindow(person_data, self.db_manager, self)
             self.medical_window.show()
     

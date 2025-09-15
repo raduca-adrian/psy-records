@@ -6,7 +6,7 @@ Handles dark/light mode switching and persistence.
 import os
 import json
 from typing import Optional, Callable, List
-from src.ui.styles import ThemeMode, colors
+from ..ui.styles import ThemeMode, colors
 
 class ThemeManager:
     """Manages theme settings across the entire application"""

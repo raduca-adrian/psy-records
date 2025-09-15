@@ -5,12 +5,12 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QFont, QIcon
 import os
-from src.core.database import DatabaseManager
-from src.ui.assessment_dialog import AssessmentDialog
-from src.ui.consultation_dialog import ConsultationDialog
-from src.utils.pdf_generator import generate_psychological_report
-from src.utils.language_manager import get_language_manager, get_text as lang_get_text
-from src.utils.theme_manager import get_theme_manager, ThemeMode
+from ..core.database import DatabaseManager
+from .assessment_dialog import AssessmentDialog
+from .consultation_dialog import ConsultationDialog
+from ..utils.pdf_generator import generate_psychological_report
+from ..utils.language_manager import get_language_manager, get_text as lang_get_text
+from ..utils.theme_manager import get_theme_manager, ThemeMode
 
 class MedicalRecordsWindow(QMainWindow):
     def __init__(self, person_data, db_manager, parent=None):
@@ -752,7 +752,7 @@ class MedicalRecordsWindow(QMainWindow):
         
     def apply_styling(self):
         """Apply theme-aware styling to the window."""
-        from src.ui.styles import colors
+        from .styles import colors
         
         current_theme = self.theme_manager.get_current_theme()
         

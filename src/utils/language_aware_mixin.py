@@ -4,7 +4,7 @@ Provides automatic language change handling and text updates.
 """
 
 from abc import ABC, abstractmethod
-from src.utils.language_manager import get_language_manager, get_text
+from .language_manager import get_language_manager, get_text
 
 class LanguageAwareMixin(ABC):
     """
