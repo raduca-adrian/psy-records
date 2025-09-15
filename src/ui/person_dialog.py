@@ -6,8 +6,8 @@ from ..utils.language_manager import get_language_manager, get_text as lang_get_
 import re
 
 class PersonDialog(QDialog):
-    def __init__(self, db_manager, person_data=None):
-        super().__init__()
+    def __init__(self, db_manager, person_data=None, parent=None):
+        super().__init__(parent)
         self.db_manager = db_manager
         self.person_data = person_data  # For editing existing person
         self.is_edit_mode = person_data is not None
@@ -174,7 +174,7 @@ class PersonDialog(QDialog):
     def validate_cnp_input(self, text):
         """Allow only digits in CNP input"""
         # Remove any non-digit characters
-        digits_only = re.sub(r'[^0-9]', '', text)
+        digits_only = re.sub(r'\D', '', text)
         if digits_only != text:
             self.cnp_input.setText(digits_only)
     
@@ -217,22 +217,9 @@ class PersonDialog(QDialog):
             QMessageBox.warning(self, "Error", error_msg)
             return
         
-        # Save to database
-        if self.is_edit_mode:
-            person_id = self.person_data[0]
-            if self.db_manager.update_person(person_id, name, cnp):
-                QMessageBox.information(self, "Success", "Person updated successfully!")
-                self.accept()
-            else:
-                QMessageBox.critical(self, "Error", 
-                                   "Failed to update person. CNP might already exist.")
-        else:
-            if self.db_manager.add_person(name, cnp):
-                QMessageBox.information(self, "Success", "Person added successfully!")
-                self.accept()
-            else:
-                QMessageBox.critical(self, "Error", 
-                                   "Failed to add person. CNP might already exist.")
+        # Do not write to the database here. The caller (main window) handles
+        # add/update operations after dialog acceptance to avoid double actions.
+        self.accept()
     
     def get_person_data(self):
         """Return the entered person data"""

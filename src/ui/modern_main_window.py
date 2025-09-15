@@ -12,9 +12,10 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
 from PyQt6.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QFont, QResizeEvent
 
-from .responsive_layout import (ResponsiveWidget, FlexibleLayout, 
-                                    ResponsiveBreakpoints, LayoutUtils,
-                                    GridResponsiveWidget, FlexGridLayout)
+from .responsive_layout import (
+    ResponsiveWidget,
+    ResponsiveBreakpoints,
+)
 from .modern_qss import get_style_manager
 from .person_dialog import PersonDialog
 from .change_password_dialog import ChangePasswordDialog
@@ -122,37 +123,38 @@ class ModernMainWindow(QMainWindow):
     
     def create_toolbar(self):
         """Create the application toolbar."""
-        toolbar = self.addToolBar('Main')
-        toolbar.setMovable(False)
-        
+        # Keep a reference so we can remove/recreate it safely on language change
+        self.toolbar = self.addToolBar('Main')
+        self.toolbar.setMovable(False)
+
         # Add person
         add_action = QAction('➕ ' + self.get_text('main_window.add_person'), self)
         add_action.triggered.connect(self.central_widget.add_person)
-        toolbar.addAction(add_action)
-        
-        toolbar.addSeparator()
-        
+        self.toolbar.addAction(add_action)
+
+        self.toolbar.addSeparator()
+
         # Refresh
         refresh_action = QAction('🔄 ' + self.get_text('main_window.refresh'), self)
         refresh_action.triggered.connect(self.load_persons)
-        toolbar.addAction(refresh_action)
-        
-        toolbar.addSeparator()
-        
+        self.toolbar.addAction(refresh_action)
+
+        self.toolbar.addSeparator()
+
         # Theme toggle
         self.theme_action = QAction('🌙', self)
         self.theme_action.triggered.connect(self.toggle_theme)
-        toolbar.addAction(self.theme_action)
-        
+        self.toolbar.addAction(self.theme_action)
+
         # Add stretch
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        toolbar.addWidget(spacer)
-        
+        self.toolbar.addWidget(spacer)
+
         # User info
         user_label = QLabel(f"👤 {self.username}")
         user_label.setProperty("class", "caption")
-        toolbar.addWidget(user_label)
+        self.toolbar.addWidget(user_label)
     
     def create_status_bar(self):
         """Create the application status bar."""
@@ -231,7 +233,11 @@ class ModernMainWindow(QMainWindow):
         self.create_menu_bar()
         
         # Update toolbar
-        self.removeToolBar(self.toolBar())
+        if hasattr(self, 'toolbar') and self.toolbar is not None:
+            try:
+                self.removeToolBar(self.toolbar)
+            except Exception:
+                pass
         self.create_toolbar()
         
         # Update central widget
@@ -266,19 +272,17 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.layout_mode_changed.connect(self.on_layout_mode_changed)
     
     def init_ui(self):
-        """Initialize the user interface with grid-based layout."""
-        # Main grid layout for better organization
-        self.main_grid = FlexGridLayout(self)
-        self.main_grid.set_auto_columns(True, max_columns=3)
-        
+        """Initialize the user interface with a simple, readable layout."""
+        # Main vertical layout
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(16, 16, 16, 16)
+        self.main_layout.setSpacing(12)
+
         # Create main content sections
         self.create_header_section()
         self.create_search_section()
         self.create_content_section()
         self.create_actions_section()
-        
-        # Apply responsive grid properties
-        self._configure_grid_layout()
     
     def create_header_section(self):
         """Create the header section with title and user info."""
@@ -297,14 +301,8 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.user_label.setProperty("class", "subtitle")
         header_layout.addWidget(self.user_label)
         
-        # Add to grid with flex properties
-        self.main_grid.add_flex_item(
-            header_container, 
-            flex_grow=2.0, 
-            flex_basis=300,
-            align_h="stretch",
-            align_v="top"
-        )
+        # Add to main layout
+        self.main_layout.addWidget(header_container)
     
     def create_search_section(self):
         """Create the search and filter section."""
@@ -321,18 +319,13 @@ class ResponsiveMainWidget(ResponsiveWidget):
         # Search input
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
-        self.search_input.textChanged.connect(self.filter_table)
+        # Connect to filtering routine
+        self.search_input.textChanged.connect(self.filter_persons)
         self.search_input.setProperty("class", "search")
         search_layout.addWidget(self.search_input)
         
-        # Add to grid
-        self.main_grid.add_flex_item(
-            search_container,
-            flex_grow=1.0,
-            flex_basis=250,
-            align_h="stretch",
-            align_v="top"
-        )
+        # Add to main layout
+        self.main_layout.addWidget(search_container)
     
     def create_content_section(self):
         """Create the main content table section."""
@@ -346,110 +339,63 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.setup_table()
         content_layout.addWidget(self.table)
         
-        # Add to grid - table takes most space
-        self.main_grid.add_flex_item(
-            content_container,
-            flex_grow=3.0,
-            flex_basis=500,
-            align_h="stretch",
-            align_v="stretch"
-        )
+        # Add to main layout - table takes most space
+        self.main_layout.addWidget(content_container, 1)
     
     def create_actions_section(self):
         """Create the action buttons section."""
-        actions_container = GridResponsiveWidget()
-        actions_container.set_column_configuration({
-            "xs": 1,  # Single column on mobile
-            "sm": 2,  # Two columns on small tablets
-            "md": 3,  # Three columns on tablets
-            "lg": 4,  # Four columns on desktop
-            "xl": 5   # Five columns on large screens
-        })
-        
+        actions_container = QWidget()
+        self.actions_layout = QHBoxLayout(actions_container)
+        self.actions_layout.setContentsMargins(0, 0, 0, 0)
+        self.actions_layout.setSpacing(8)
+
         # Create action buttons
-        self.create_action_buttons(actions_container)
-        
-        # Add to main grid
-        self.main_grid.add_flex_item(
-            actions_container,
-            flex_grow=1.0,
-            flex_basis=400,
-            align_h="stretch",
-            align_v="center"
-        )
+        self.create_action_buttons()
+
+        # Add stretch at the end for spacing
+        self.actions_layout.addStretch()
+
+        # Add to main layout
+        self.main_layout.addWidget(actions_container)
     
-    def create_action_buttons(self, container):
+    def create_action_buttons(self):
         """Create action buttons with proper grid alignment."""
         # Add Person button
         self.add_person_btn = QPushButton(f"👤 {self.get_text('main_window.add_person')}")
         self.add_person_btn.setProperty("class", "success")
         self.add_person_btn.clicked.connect(self.add_person)
-        container.add_grid_item(self.add_person_btn, weight=1, min_width=150, preferred_width=200)
+        self.actions_layout.addWidget(self.add_person_btn)
         
         # Edit Person button
         self.edit_person_btn = QPushButton(f"✏️ {self.get_text('main_window.edit_person')}")
         self.edit_person_btn.clicked.connect(self.edit_person)
-        container.add_grid_item(self.edit_person_btn, weight=1, min_width=150, preferred_width=200)
+        self.edit_person_btn.setEnabled(False)
+        self.actions_layout.addWidget(self.edit_person_btn)
         
         # Delete Person button
         self.delete_person_btn = QPushButton(f"🗑️ {self.get_text('main_window.delete_person')}")
         self.delete_person_btn.setProperty("class", "danger")
         self.delete_person_btn.clicked.connect(self.delete_person)
-        container.add_grid_item(self.delete_person_btn, weight=1, min_width=150, preferred_width=200)
+        self.delete_person_btn.setEnabled(False)
+        self.actions_layout.addWidget(self.delete_person_btn)
         
         # View Records button
         self.view_records_btn = QPushButton(f"📋 {self.get_text('main_window.view_records')}")
         self.view_records_btn.setProperty("class", "primary")
         self.view_records_btn.clicked.connect(self.view_medical_records)
-        container.add_grid_item(self.view_records_btn, weight=1, min_width=150, preferred_width=200)
+        self.view_records_btn.setEnabled(False)
+        self.actions_layout.addWidget(self.view_records_btn)
         
         # Theme Toggle button
         self.theme_toggle_btn = QPushButton()
         self.theme_toggle_btn.setProperty("class", "icon")
         self.theme_toggle_btn.clicked.connect(self.toggle_theme)
         self.update_theme_button()
-        container.add_grid_item(self.theme_toggle_btn, weight=1, min_width=60, preferred_width=80)
+        self.actions_layout.addWidget(self.theme_toggle_btn)
     
-    def _configure_grid_layout(self):
-        """Configure the main grid layout properties."""
-        # Set column weights for balanced layout
-        self.main_grid.set_column_weights({
-            0: 1.5,  # Header and search get more weight
-            1: 2.0,  # Content gets most weight
-            2: 1.0   # Actions get standard weight
-        })
-        
-        # Configure responsive spacing
-        self.main_grid.setSpacing(16)
-        self.main_grid.setContentsMargins(16, 16, 16, 16)
+    # (grid layout removed)
     
-    def setup_table(self):
-        """Setup the persons table with proper grid alignment."""
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels([
-            self.get_text("main_window.name"), 
-            self.get_text("main_window.cnp"), 
-            self.get_text("main_window.phone"), 
-            self.get_text("main_window.created")
-        ])
-        
-        # Configure header for better visibility
-        header = self.table.horizontalHeader()
-        header.setVisible(True)
-        header.setMinimumHeight(40)
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        
-        # Table properties
-        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setAlternatingRowColors(True)
-        self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(50)
-        
-        # Connect selection signal
-        self.table.itemSelectionChanged.connect(self.on_person_selected)
+    # (removed duplicate older setup_table implementation)
     
     def setup_table(self):
         """Setup the persons table."""
@@ -482,86 +428,19 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.table.itemSelectionChanged.connect(self.on_selection_changed)
         self.table.itemDoubleClicked.connect(self.edit_person)
     
-    def create_action_buttons(self):
-        """Create action buttons with responsive layout."""
-        # Button definitions
-        self.add_button = QPushButton(f"➕ {self.get_text('main_window.add_person')}")
-        self.add_button.setProperty("class", "success")
-        self.add_button.clicked.connect(self.add_person)
-        
-        self.edit_button = QPushButton(f"✏️ {self.get_text('main_window.edit_person')}")
-        self.edit_button.clicked.connect(self.edit_person)
-        self.edit_button.setEnabled(False)
-        
-        self.delete_button = QPushButton(f"🗑️ {self.get_text('main_window.delete_person')}")
-        self.delete_button.setProperty("class", "danger")
-        self.delete_button.clicked.connect(self.delete_person)
-        self.delete_button.setEnabled(False)
-        
-        self.medical_records_button = QPushButton(f"📋 {self.get_text('main_window.medical_records')}")
-        self.medical_records_button.clicked.connect(self.view_medical_records)
-        self.medical_records_button.setEnabled(False)
-        
-        self.refresh_button = QPushButton(f"🔄 {self.get_text('main_window.refresh')}")
-        self.refresh_button.setProperty("class", "secondary")
-        self.refresh_button.clicked.connect(self.load_persons)
-        
-        # Create responsive button group
-        buttons = [self.add_button, self.edit_button, self.delete_button, 
-                  self.medical_records_button, self.refresh_button]
-        
-        self.button_container = FlexibleLayout.create_button_group(buttons, responsive=True)
-        self.main_layout.addWidget(self.button_container)
+    # (removed legacy create_action_buttons without parameters to avoid signature conflict)
     
     def adapt_to_layout_mode(self, mode):
-        """Adapt layout to different screen sizes."""
-        if mode == "xs" or mode == "sm":
-            # Mobile layout: stack buttons vertically
-            self.adapt_to_mobile_layout()
-        else:
-            # Desktop layout: buttons horizontally
-            self.adapt_to_desktop_layout()
+        """No-op: grid system removed; keep method for compatibility."""
+        pass
     
     def adapt_to_mobile_layout(self):
-        """Adapt to mobile layout."""
-        # Update button container for vertical layout
-        if hasattr(self, 'button_container') and self.button_container.layout():
-            layout = self.button_container.layout()
-            
-            # Clear and recreate with vertical layout
-            for i in reversed(range(layout.count())):
-                item = layout.takeAt(i)
-                if item.widget():
-                    item.widget().setParent(None)
-            
-            # Recreate with vertical layout
-            buttons = [self.add_button, self.edit_button, self.delete_button, 
-                      self.medical_records_button, self.refresh_button]
-            
-            new_layout = QVBoxLayout(self.button_container)
-            for button in buttons:
-                new_layout.addWidget(button)
+        """Removed: not used without grid system."""
+        pass
     
     def adapt_to_desktop_layout(self):
-        """Adapt to desktop layout."""
-        # Update button container for horizontal layout
-        if hasattr(self, 'button_container') and self.button_container.layout():
-            layout = self.button_container.layout()
-            
-            # Clear and recreate with horizontal layout
-            for i in reversed(range(layout.count())):
-                item = layout.takeAt(i)
-                if item.widget():
-                    item.widget().setParent(None)
-            
-            # Recreate with horizontal layout
-            buttons = [self.add_button, self.edit_button, self.delete_button, 
-                      self.medical_records_button, self.refresh_button]
-            
-            new_layout = QHBoxLayout(self.button_container)
-            for button in buttons:
-                new_layout.addWidget(button)
-            new_layout.addStretch()
+        """Removed: not used without grid system."""
+        pass
     
     def load_persons(self):
         """Load persons from database."""
@@ -592,9 +471,13 @@ class ResponsiveMainWidget(ResponsiveWidget):
     def on_selection_changed(self):
         """Handle table selection changes."""
         selected = len(self.table.selectedItems()) > 0
-        self.edit_button.setEnabled(selected)
-        self.delete_button.setEnabled(selected)
-        self.medical_records_button.setEnabled(selected)
+        # Enable/disable actions created in container-based button setup
+        if hasattr(self, 'edit_person_btn'):
+            self.edit_person_btn.setEnabled(selected)
+        if hasattr(self, 'delete_person_btn'):
+            self.delete_person_btn.setEnabled(selected)
+        if hasattr(self, 'view_records_btn'):
+            self.view_records_btn.setEnabled(selected)
         
         if selected:
             person_data = self.get_selected_person()
@@ -615,7 +498,7 @@ class ResponsiveMainWidget(ResponsiveWidget):
     
     def add_person(self):
         """Add a new person."""
-        dialog = PersonDialog(parent=self)
+        dialog = PersonDialog(self.db_manager, parent=self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             person_data = dialog.get_person_data()
             if person_data:
@@ -623,13 +506,13 @@ class ResponsiveMainWidget(ResponsiveWidget):
                 if success:
                     self.person_added.emit((0, person_data['name'], person_data['cnp'], ''))
                 else:
-                    QMessageBox.critical(self, "Error", "Failed to add person.")
+                    QMessageBox.critical(self, "Error", "Failed to add person. CNP might already exist.")
     
     def edit_person(self):
         """Edit selected person."""
         person_data = self.get_selected_person()
         if person_data:
-            dialog = PersonDialog(person_data, parent=self)
+            dialog = PersonDialog(self.db_manager, person_data, parent=self)
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 new_data = dialog.get_person_data()
                 if new_data:
@@ -637,7 +520,7 @@ class ResponsiveMainWidget(ResponsiveWidget):
                     if success:
                         self.person_edited.emit((person_data[0], new_data['name'], new_data['cnp'], person_data[3]))
                     else:
-                        QMessageBox.critical(self, "Error", "Failed to update person.")
+                        QMessageBox.critical(self, "Error", "Failed to update person. CNP might already exist.")
     
     def delete_person(self):
         """Delete selected person."""
@@ -671,9 +554,29 @@ class ResponsiveMainWidget(ResponsiveWidget):
     
     def on_language_updated(self, locale: str):
         """Handle language updates."""
-        # Update all text elements
-        self.title_label.setText(self.get_text('main_window.title'))
-        # Update other UI elements...
+        # Update localized UI elements within this widget
+        try:
+            self.title_label.setText(self.get_text('main_window.title'))
+        except Exception:
+            pass
+        # Update table headers
+        try:
+            self.table.setHorizontalHeaderLabels([
+                self.get_text('main_window.id'),
+                self.get_text('main_window.name'),
+                self.get_text('main_window.cnp'),
+                self.get_text('main_window.created')
+            ])
+        except Exception:
+            pass
+        # Update action buttons
+        try:
+            self.add_person_btn.setText(f"👤 {self.get_text('main_window.add_person')}")
+            self.edit_person_btn.setText(f"✏️ {self.get_text('main_window.edit_person')}")
+            self.delete_person_btn.setText(f"🗑️ {self.get_text('main_window.delete_person')}")
+            self.view_records_btn.setText(f"📋 {self.get_text('main_window.view_records')}")
+        except Exception:
+            pass
     
     def on_theme_updated(self, theme_mode):
         """Handle theme updates."""
@@ -683,3 +586,16 @@ class ResponsiveMainWidget(ResponsiveWidget):
     def get_text(self, key):
         """Get translated text."""
         return lang_get_text(key, key)
+
+    # --- Theme helpers for actions grid ---
+    def update_theme_button(self):
+        """Update theme toggle button icon/text based on current theme."""
+        if hasattr(self, 'theme_toggle_btn'):
+            current_theme = get_theme_manager().get_current_theme()
+            self.theme_toggle_btn.setText('☀️' if current_theme == ThemeMode.DARK else '🌙')
+
+    def toggle_theme(self):
+        """Delegate theme toggle to main window/theme manager if available."""
+        tm = get_theme_manager()
+        current = tm.get_current_theme()
+        tm.change_theme(ThemeMode.DARK if current == ThemeMode.LIGHT else ThemeMode.LIGHT)
