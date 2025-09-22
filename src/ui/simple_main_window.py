@@ -30,6 +30,7 @@ from .simple_edit_session_dialog import SimpleEditSessionDialog
 from .simple_select_record_dialog import SimpleSelectRecordDialog
 from ..utils.pdf_generator import generate_psychological_report
 from ..utils.language_manager import get_language_manager, get_text as _t
+from .column_view import ColumnManager
 
 
 class SimpleMainWindow(QMainWindow):
@@ -102,10 +103,13 @@ class SimpleMainWindow(QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.addLayout(button_row)
         left_layout.addWidget(self.table)
+        self.columns = ColumnManager(splitter)
         splitter.addWidget(left_panel)
         splitter.addWidget(self.records_view)
+        splitter.addWidget(self.columns)
         splitter.setStretchFactor(0, 2)
         splitter.setStretchFactor(1, 3)
+        splitter.setStretchFactor(2, 3)
 
         layout.addWidget(title)
         layout.addWidget(subtitle)
@@ -194,6 +198,11 @@ class SimpleMainWindow(QMainWindow):
         if not consultations:
             lines.append("- None")
         self.records_view.setPlainText("\n".join(lines))
+        # Also update or open a column for details
+        self.columns.add_text_column(
+            _t('psychological_records.title', 'Psychological Records'),
+            "\n".join(lines),
+        )
 
     def add_checkup(self) -> None:
         if getattr(self, "db", None) is None:
