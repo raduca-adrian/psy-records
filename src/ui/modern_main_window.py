@@ -58,66 +58,66 @@ class ModernMainWindow(QMainWindow):
     def init_ui(self):
         """Initialize the user interface with responsive design."""
         self.setWindowTitle(f"Psychological Records System - {self.username}")
-        self.setMinimumSize(800, 600)
-        self.resize(1200, 800)
-        
+        self.setMinimumSize(600, 400)
+        self.resize(800, 500)
+
         # Create central widget with responsive container
         self.central_widget = ResponsiveMainWidget(self.db_manager, self.username)
         self.setCentralWidget(self.central_widget)
-        
+
         # Connect signals
         self.central_widget.person_selected.connect(self.on_person_selected)
         self.central_widget.person_added.connect(self.on_person_added)
         self.central_widget.person_edited.connect(self.on_person_edited)
         self.central_widget.person_deleted.connect(self.on_person_deleted)
-        
+
         # Create menu bar
         self.create_menu_bar()
-        
+
         # Create status bar
         self.create_status_bar()
-        
+
         # Create toolbar
         self.create_toolbar()
     
     def create_menu_bar(self):
         """Create the application menu bar."""
         menubar = self.menuBar()
-        
+
         # File menu
-        file_menu = menubar.addMenu(self.get_text('main_window.file'))
-        
-        new_person_action = QAction(self.get_text('main_window.new_person'), self)
+        file_menu = menubar.addMenu(self.get_text('menu.file'))
+
+        new_person_action = QAction(self.get_text('menu.add_person'), self)
         new_person_action.setShortcut('Ctrl+N')
         new_person_action.triggered.connect(self.central_widget.add_person)
         file_menu.addAction(new_person_action)
-        
+
         file_menu.addSeparator()
-        
-        exit_action = QAction(self.get_text('main_window.exit'), self)
+
+        exit_action = QAction(self.get_text('menu.exit'), self)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
-        
-        # View menu
-        view_menu = menubar.addMenu(self.get_text('main_window.view'))
-        
-        refresh_action = QAction(self.get_text('main_window.refresh'), self)
+
+        # Edit/View menu
+        view_menu = menubar.addMenu(self.get_text('menu.edit'))
+
+        refresh_action = QAction(self.get_text('menu.refresh'), self)
         refresh_action.setShortcut('F5')
         refresh_action.triggered.connect(self.load_persons)
         view_menu.addAction(refresh_action)
-        
+
         view_menu.addSeparator()
-        
-        toggle_theme_action = QAction(self.get_text('main_window.toggle_theme'), self)
+
+        toggle_theme_action = QAction(self.get_text('main_window.toggle_theme'), self)  # No translation in menu, keep as is
         toggle_theme_action.setShortcut('Ctrl+T')
         toggle_theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(toggle_theme_action)
-        
+
         # Help menu
-        help_menu = menubar.addMenu(self.get_text('main_window.help'))
-        
-        about_action = QAction(self.get_text('main_window.about'), self)
+        help_menu = menubar.addMenu(self.get_text('main_window.help'))  # No translation in menu, keep as is
+
+        about_action = QAction(self.get_text('main_window.about'), self)  # No translation in menu, keep as is
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
     
@@ -128,14 +128,14 @@ class ModernMainWindow(QMainWindow):
         self.toolbar.setMovable(False)
 
         # Add person
-        add_action = QAction('➕ ' + self.get_text('main_window.add_person'), self)
+        add_action = QAction('➕ ' + self.get_text('menu.add_person'), self)
         add_action.triggered.connect(self.central_widget.add_person)
         self.toolbar.addAction(add_action)
 
         self.toolbar.addSeparator()
 
         # Refresh
-        refresh_action = QAction('🔄 ' + self.get_text('main_window.refresh'), self)
+        refresh_action = QAction('🔄 ' + self.get_text('menu.refresh'), self)
         refresh_action.triggered.connect(self.load_persons)
         self.toolbar.addAction(refresh_action)
 
@@ -267,16 +267,16 @@ class ResponsiveMainWidget(ResponsiveWidget):
         self.db_manager = db_manager
         self.username = username
         self.current_layout_mode = "standard"
-        
+
         self.init_ui()
         self.layout_mode_changed.connect(self.on_layout_mode_changed)
-    
+
     def init_ui(self):
         """Initialize the user interface with a simple, readable layout."""
         # Main vertical layout
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(16, 16, 16, 16)
-        self.main_layout.setSpacing(12)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
+        self.main_layout.setSpacing(4)
 
         # Create main content sections
         self.create_header_section()
@@ -289,18 +289,18 @@ class ResponsiveMainWidget(ResponsiveWidget):
         header_container = QWidget()
         header_layout = QVBoxLayout(header_container)
         header_layout.setContentsMargins(0, 0, 0, 0)
-        header_layout.setSpacing(8)
-        
+        header_layout.setSpacing(2)
+
         # Title
         self.title_label = QLabel(self.get_text('main_window.title'))
-        self.title_label.setProperty("class", "title")
+        self.title_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 2px;")
         header_layout.addWidget(self.title_label)
-        
+
         # User info
         self.user_label = QLabel(f"{self.get_text('main_window.logged_in_as')}: {self.username}")
-        self.user_label.setProperty("class", "subtitle")
+        self.user_label.setStyleSheet("font-size: 10px; color: #555; margin-bottom: 2px;")
         header_layout.addWidget(self.user_label)
-        
+
         # Add to main layout
         self.main_layout.addWidget(header_container)
     
@@ -309,21 +309,21 @@ class ResponsiveMainWidget(ResponsiveWidget):
         search_container = QWidget()
         search_layout = QVBoxLayout(search_container)
         search_layout.setContentsMargins(0, 0, 0, 0)
-        search_layout.setSpacing(8)
-        
+        search_layout.setSpacing(2)
+
         # Search label
         search_label = QLabel(self.get_text('main_window.search'))
-        search_label.setProperty("class", "label")
+        search_label.setStyleSheet("font-size: 10px; color: #333;")
         search_layout.addWidget(search_label)
-        
+
         # Search input
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText(self.get_text('main_window.search_placeholder'))
         # Connect to filtering routine
         self.search_input.textChanged.connect(self.filter_persons)
-        self.search_input.setProperty("class", "search")
+        self.search_input.setStyleSheet("font-size: 10px; padding: 2px 4px;")
         search_layout.addWidget(self.search_input)
-        
+
         # Add to main layout
         self.main_layout.addWidget(search_container)
     
@@ -332,13 +332,14 @@ class ResponsiveMainWidget(ResponsiveWidget):
         content_container = QWidget()
         content_layout = QVBoxLayout(content_container)
         content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(8)
-        
+        content_layout.setSpacing(2)
+
         # Table
         self.table = QTableWidget()
+        self.table.setStyleSheet("font-size: 11px;")
         self.setup_table()
         content_layout.addWidget(self.table)
-        
+
         # Add to main layout - table takes most space
         self.main_layout.addWidget(content_container, 1)
     
@@ -347,7 +348,7 @@ class ResponsiveMainWidget(ResponsiveWidget):
         actions_container = QWidget()
         self.actions_layout = QHBoxLayout(actions_container)
         self.actions_layout.setContentsMargins(0, 0, 0, 0)
-        self.actions_layout.setSpacing(8)
+        self.actions_layout.setSpacing(2)
 
         # Create action buttons
         self.create_action_buttons()
@@ -362,33 +363,34 @@ class ResponsiveMainWidget(ResponsiveWidget):
         """Create action buttons with proper grid alignment."""
         # Add Person button
         self.add_person_btn = QPushButton(f"👤 {self.get_text('main_window.add_person')}")
-        self.add_person_btn.setProperty("class", "success")
+        self.add_person_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         self.add_person_btn.clicked.connect(self.add_person)
         self.actions_layout.addWidget(self.add_person_btn)
-        
+
         # Edit Person button
         self.edit_person_btn = QPushButton(f"✏️ {self.get_text('main_window.edit_person')}")
+        self.edit_person_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         self.edit_person_btn.clicked.connect(self.edit_person)
         self.edit_person_btn.setEnabled(False)
         self.actions_layout.addWidget(self.edit_person_btn)
-        
+
         # Delete Person button
         self.delete_person_btn = QPushButton(f"🗑️ {self.get_text('main_window.delete_person')}")
-        self.delete_person_btn.setProperty("class", "danger")
+        self.delete_person_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         self.delete_person_btn.clicked.connect(self.delete_person)
         self.delete_person_btn.setEnabled(False)
         self.actions_layout.addWidget(self.delete_person_btn)
-        
+
         # View Records button
         self.view_records_btn = QPushButton(f"📋 {self.get_text('main_window.view_records')}")
-        self.view_records_btn.setProperty("class", "primary")
+        self.view_records_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         self.view_records_btn.clicked.connect(self.view_medical_records)
         self.view_records_btn.setEnabled(False)
         self.actions_layout.addWidget(self.view_records_btn)
-        
+
         # Theme Toggle button
         self.theme_toggle_btn = QPushButton()
-        self.theme_toggle_btn.setProperty("class", "icon")
+        self.theme_toggle_btn.setStyleSheet("font-size: 10px; padding: 2px 6px;")
         self.theme_toggle_btn.clicked.connect(self.toggle_theme)
         self.update_theme_button()
         self.actions_layout.addWidget(self.theme_toggle_btn)

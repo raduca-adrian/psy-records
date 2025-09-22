@@ -46,7 +46,17 @@
     "edit_person": "Editați Persoana",
     "delete_person": "Ștergeți Persoana",
     "psychological_records": "Înregistrări Psihologice",
+    "view_records": "Vizualizați Înregistrările",
     "refresh": "Reîmprospătare",
+    "toggle_theme": "Comutare Temă",
+    "help": "Ajutor",
+    "about": "Despre",
+    "about_text": "Aplicația de Înregistrări Psihologice",
+    "last_updated": "Ultima actualizare",
+    "selected": "Selectat",
+    "added": "Adăugat",
+    "updated": "Actualizat",
+    "deleted": "Șters",
     "id": "ID",
     "name": "Nume",
     "cnp": "CNP",
@@ -227,6 +237,7 @@
     "edit": "Editare",
     "add": "Adăugare",
     "refresh": "Reîmprospătare",
-    "open": "Deschidere"
+    "open": "Deschidere",
+    "theme_toggle_tooltip": "Comutați tema deschis/închis"
   }
 }

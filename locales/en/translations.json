@@ -45,7 +45,17 @@
     "edit_person": "Edit Person", 
     "delete_person": "Delete Person",
     "psychological_records": "Psychological Records",
+    "view_records": "View Records",
     "refresh": "Refresh",
+    "toggle_theme": "Toggle Theme",
+    "help": "Help",
+    "about": "About",
+    "about_text": "Psychological Records Application",
+    "last_updated": "Last updated",
+    "selected": "Selected",
+    "added": "Added",
+    "updated": "Updated",
+    "deleted": "Deleted",
     "id": "ID",
     "name": "Name",
     "cnp": "CNP",
@@ -174,6 +184,7 @@
     "file": "File",
     "edit": "Edit",
     "account": "Account",
+    "language": "Language",
     "refresh": "Refresh",
     "exit": "Exit",
     "add_person": "Add Person",
@@ -225,6 +236,7 @@
     "edit": "Edit",
     "add": "Add",
     "refresh": "Refresh",
-    "open": "Open"
+    "open": "Open",
+    "theme_toggle_tooltip": "Toggle light/dark theme"
   }
 }
