@@ -3,6 +3,7 @@ A minimal PyQt6 main window to run a simplified version of the app.
 Keeps zero coupling to the complex application to allow quick iteration.
 """
 
+import os
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
@@ -24,6 +25,10 @@ from PyQt6.QtWidgets import (
 from .simple_add_patient_dialog import SimpleAddPatientDialog
 from .simple_add_checkup_dialog import SimpleAddCheckupDialog
 from .simple_add_session_dialog import SimpleAddSessionDialog
+from .simple_edit_checkup_dialog import SimpleEditCheckupDialog
+from .simple_edit_session_dialog import SimpleEditSessionDialog
+from .simple_select_record_dialog import SimpleSelectRecordDialog
+from ..utils.pdf_generator import generate_psychological_report
 
 
 class SimpleMainWindow(QMainWindow):
@@ -60,10 +65,19 @@ class SimpleMainWindow(QMainWindow):
         new_checkup_btn.clicked.connect(self.add_checkup)
         new_session_btn = QPushButton("New Session", central)
         new_session_btn.clicked.connect(self.add_session)
+        edit_checkup_btn = QPushButton("Edit Checkup", central)
+        edit_checkup_btn.clicked.connect(self.edit_checkup)
+        edit_session_btn = QPushButton("Edit Session", central)
+        edit_session_btn.clicked.connect(self.edit_session)
+        export_pdf_btn = QPushButton("Export PDF", central)
+        export_pdf_btn.clicked.connect(self.export_pdf)
         button_row.addWidget(add_btn)
         button_row.addWidget(refresh_btn)
         button_row.addWidget(new_checkup_btn)
         button_row.addWidget(new_session_btn)
+        button_row.addWidget(edit_checkup_btn)
+        button_row.addWidget(edit_session_btn)
+        button_row.addWidget(export_pdf_btn)
         button_row.addStretch(1)
 
         self.table = QTableWidget(0, 3, central)
@@ -229,5 +243,100 @@ class SimpleMainWindow(QMainWindow):
             return
         self.load_records_for_selected()
         self.statusBar().showMessage("Session added", 1500)
+
+    def edit_checkup(self) -> None:
+        if getattr(self, "db", None) is None:
+            return
+        person_id = self._get_selected_person_id()
+        if person_id is None:
+            self.statusBar().showMessage("Select a patient first", 2000)
+            return
+        assessments = self.db.get_assessments_for_person(person_id)
+        items = [(a[0], f"{a[1]} - {a[5] or 'No diagnosis'}") for a in assessments]
+        dlg = SimpleSelectRecordDialog("Select Checkup", items, self)
+        if dlg.exec() != dlg.DialogCode.Accepted:
+            return
+        rec_id = dlg.get_selected_id()
+        if rec_id is None:
+            return
+        current = next((a for a in assessments if a[0] == rec_id), None)
+        if not current:
+            return
+        edit = SimpleEditCheckupDialog(current, self)
+        if edit.exec() != edit.DialogCode.Accepted:
+            return
+        v = edit.get_values()
+        self.db.update_assessment(
+            v["assessment_id"],
+            v["date"],
+            v["chief"],
+            v["history"],
+            v["exam"],
+            v["diagnosis"],
+            v["plan"],
+            v["notes"],
+        )
+        self.load_records_for_selected()
+        self.statusBar().showMessage("Checkup updated", 1500)
+
+    def edit_session(self) -> None:
+        if getattr(self, "db", None) is None:
+            return
+        person_id = self._get_selected_person_id()
+        if person_id is None:
+            self.statusBar().showMessage("Select a patient first", 2000)
+            return
+        consultations = self.db.get_consultations_for_person(person_id)
+        items = [(c[0], f"{c[1]} - {c[2]}") for c in consultations]
+        dlg = SimpleSelectRecordDialog("Select Session", items, self)
+        if dlg.exec() != dlg.DialogCode.Accepted:
+            return
+        rec_id = dlg.get_selected_id()
+        if rec_id is None:
+            return
+        current = next((c for c in consultations if c[0] == rec_id), None)
+        if not current:
+            return
+        edit = SimpleEditSessionDialog(current, self)
+        if edit.exec() != edit.DialogCode.Accepted:
+            return
+        v = edit.get_values()
+        self.db.update_consultation(
+            v["consultation_id"],
+            v["date"],
+            v["type"],
+            v["symptoms"],
+            v["findings"],
+            v["recommendations"],
+            v["medications"],
+            v["next_appointment"],
+            v["notes"],
+        )
+        self.load_records_for_selected()
+        self.statusBar().showMessage("Session updated", 1500)
+
+    def export_pdf(self) -> None:
+        if getattr(self, "db", None) is None:
+            return
+        person_id = self._get_selected_person_id()
+        if person_id is None:
+            self.statusBar().showMessage("Select a patient first", 2000)
+            return
+        record = self.db.get_person_complete_record(person_id)
+        if not record:
+            self.statusBar().showMessage("No data to export", 2000)
+            return
+        person = record.get("person")
+        assessments = record.get("assessments", [])
+        consultations = record.get("consultations", [])
+        out_dir = "data"
+        os.makedirs(out_dir, exist_ok=True)
+        safe_name = (person[1] or "patient").replace(" ", "_")
+        path = os.path.join(out_dir, f"Report_{safe_name}.pdf")
+        try:
+            generate_psychological_report(person, assessments, consultations, path)
+            self.statusBar().showMessage(f"Exported to {path}", 3000)
+        except Exception:
+            self.statusBar().showMessage("Failed to export PDF", 3000)
 
 
