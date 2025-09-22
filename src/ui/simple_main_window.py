@@ -29,6 +29,7 @@ from .simple_edit_checkup_dialog import SimpleEditCheckupDialog
 from .simple_edit_session_dialog import SimpleEditSessionDialog
 from .simple_select_record_dialog import SimpleSelectRecordDialog
 from ..utils.pdf_generator import generate_psychological_report
+from ..utils.language_manager import get_language_manager, get_text as _t
 
 
 class SimpleMainWindow(QMainWindow):
@@ -36,7 +37,8 @@ class SimpleMainWindow(QMainWindow):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Psychological Records – Simple")
+        self.language_manager = get_language_manager()
+        self.setWindowTitle(_t('app.title', 'Psychological Records – Simple'))
         self.setMinimumSize(800, 500)
 
         # Optional: use default app icon if one is set by the entry point
@@ -48,28 +50,28 @@ class SimpleMainWindow(QMainWindow):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        title = QLabel("Patients", central)
+        title = QLabel(_t('main_window.psychological_records', 'Patients'), central)
         title.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         title.setProperty("class", "h1")
 
-        subtitle = QLabel("Manage patient records in a simplified flow.", central)
+        subtitle = QLabel(_t('main_window.about_text', 'Manage patient records in a simplified flow.'), central)
         subtitle.setWordWrap(True)
         subtitle.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         button_row = QHBoxLayout()
-        add_btn = QPushButton("Add Patient", central)
+        add_btn = QPushButton(_t('menu.add_person', 'Add Patient'), central)
         add_btn.clicked.connect(self.add_patient)
-        refresh_btn = QPushButton("Refresh", central)
+        refresh_btn = QPushButton(_t('menu.refresh', 'Refresh'), central)
         refresh_btn.clicked.connect(self.refresh_patients)
-        new_checkup_btn = QPushButton("New Checkup", central)
+        new_checkup_btn = QPushButton(_t('psychological_records.new_assessment', 'New Checkup'), central)
         new_checkup_btn.clicked.connect(self.add_checkup)
-        new_session_btn = QPushButton("New Session", central)
+        new_session_btn = QPushButton(_t('psychological_records.new_session', 'New Session'), central)
         new_session_btn.clicked.connect(self.add_session)
-        edit_checkup_btn = QPushButton("Edit Checkup", central)
+        edit_checkup_btn = QPushButton(_t('psychological_records.edit', 'Edit Checkup'), central)
         edit_checkup_btn.clicked.connect(self.edit_checkup)
-        edit_session_btn = QPushButton("Edit Session", central)
+        edit_session_btn = QPushButton(_t('psychological_records.edit', 'Edit Session'), central)
         edit_session_btn.clicked.connect(self.edit_session)
-        export_pdf_btn = QPushButton("Export PDF", central)
+        export_pdf_btn = QPushButton(_t('psychological_records.generate_report', 'Export PDF'), central)
         export_pdf_btn.clicked.connect(self.export_pdf)
         button_row.addWidget(add_btn)
         button_row.addWidget(refresh_btn)
@@ -81,7 +83,11 @@ class SimpleMainWindow(QMainWindow):
         button_row.addStretch(1)
 
         self.table = QTableWidget(0, 3, central)
-        self.table.setHorizontalHeaderLabels(["ID", "Name", "CNP"])
+        self.table.setHorizontalHeaderLabels([
+            _t('main_window.id', 'ID'),
+            _t('main_window.name', 'Name'),
+            _t('main_window.cnp', 'CNP'),
+        ])
         self.table.setSelectionBehavior(self.table.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(self.table.EditTrigger.NoEditTriggers)
         self.table.itemSelectionChanged.connect(self.load_records_for_selected)
@@ -163,26 +169,26 @@ class SimpleMainWindow(QMainWindow):
             return
         person_id = self._get_selected_person_id()
         if person_id is None:
-            self.records_view.setPlainText("Select a patient to view records.")
+            self.records_view.setPlainText(_t('main_window.select_person_records', 'Select a patient to view records.'))
             return
         record = self.db.get_person_complete_record(person_id)
         if not record:
-            self.records_view.setPlainText("No records found.")
+            self.records_view.setPlainText(_t('psychological_records.no_data_found', 'No records found.'))
             return
         person = record.get("person")
         assessments = record.get("assessments", [])
         consultations = record.get("consultations", [])
 
         lines = []
-        lines.append(f"Patient: {person[1]} (CNP: {person[2]})")
+        lines.append(f"{_t('pdf.client_name', 'Client Name:')} {person[1]} ({_t('pdf.cnp','CNP')}: {person[2]})")
         lines.append("")
-        lines.append("Checkups:")
+        lines.append(_t('pdf.psychological_assessments', 'Checkups:'))
         for a in assessments:
             lines.append(f"- {a[1]} | Dx: {a[5]} | Notes: {a[8] if len(a) > 8 else ''}")
         if not assessments:
             lines.append("- None")
         lines.append("")
-        lines.append("Sessions:")
+        lines.append(_t('pdf.therapy_sessions', 'Sessions:'))
         for c in consultations:
             lines.append(f"- {c[1]} [{c[2]}] | Reco: {c[6]} | Notes: {c[9] if len(c) > 9 else ''}")
         if not consultations:
@@ -194,7 +200,7 @@ class SimpleMainWindow(QMainWindow):
             return
         person_id = self._get_selected_person_id()
         if person_id is None:
-            self.statusBar().showMessage("Select a patient first", 2000)
+            self.statusBar().showMessage(_t('main_window.select_person_records', 'Select a patient first'), 2000)
             return
         dialog = SimpleAddCheckupDialog(self)
         if dialog.exec() != dialog.DialogCode.Accepted:
@@ -211,7 +217,7 @@ class SimpleMainWindow(QMainWindow):
             v["notes"],
         )
         if not ok:
-            self.statusBar().showMessage("Failed to add checkup", 2000)
+            self.statusBar().showMessage(_t('common.error', 'Failed to add checkup'), 2000)
             return
         self.load_records_for_selected()
         self.statusBar().showMessage("Checkup added", 1500)
@@ -221,7 +227,7 @@ class SimpleMainWindow(QMainWindow):
             return
         person_id = self._get_selected_person_id()
         if person_id is None:
-            self.statusBar().showMessage("Select a patient first", 2000)
+            self.statusBar().showMessage(_t('main_window.select_person_records', 'Select a patient first'), 2000)
             return
         dialog = SimpleAddSessionDialog(self)
         if dialog.exec() != dialog.DialogCode.Accepted:
@@ -239,7 +245,7 @@ class SimpleMainWindow(QMainWindow):
             v["notes"],
         )
         if not ok:
-            self.statusBar().showMessage("Failed to add session", 2000)
+            self.statusBar().showMessage(_t('common.error', 'Failed to add session'), 2000)
             return
         self.load_records_for_selected()
         self.statusBar().showMessage("Session added", 1500)
@@ -249,7 +255,7 @@ class SimpleMainWindow(QMainWindow):
             return
         person_id = self._get_selected_person_id()
         if person_id is None:
-            self.statusBar().showMessage("Select a patient first", 2000)
+            self.statusBar().showMessage(_t('main_window.select_person_records', 'Select a patient first'), 2000)
             return
         assessments = self.db.get_assessments_for_person(person_id)
         items = [(a[0], f"{a[1]} - {a[5] or 'No diagnosis'}") for a in assessments]
@@ -324,7 +330,7 @@ class SimpleMainWindow(QMainWindow):
             return
         record = self.db.get_person_complete_record(person_id)
         if not record:
-            self.statusBar().showMessage("No data to export", 2000)
+            self.statusBar().showMessage(_t('psychological_records.no_data_found', 'No data to export'), 2000)
             return
         person = record.get("person")
         assessments = record.get("assessments", [])
@@ -335,8 +341,8 @@ class SimpleMainWindow(QMainWindow):
         path = os.path.join(out_dir, f"Report_{safe_name}.pdf")
         try:
             generate_psychological_report(person, assessments, consultations, path)
-            self.statusBar().showMessage(f"Exported to {path}", 3000)
+            self.statusBar().showMessage(_t('psychological_records.report_generated', 'Exported') + f" → {path}", 3000)
         except Exception:
-            self.statusBar().showMessage("Failed to export PDF", 3000)
+            self.statusBar().showMessage(_t('psychological_records.report_failed', 'Failed to export PDF'), 3000)
 
 
