@@ -8,13 +8,15 @@ from __future__ import annotations
 import os
 import sys
 
-from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtCore import Qt, QPoint, QSettings
 from PyQt6.QtGui import QColor, QIcon, QPainter, QPixmap, QPolygon
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
-from .ui.simple_main_window import SimpleMainWindow
+from .ui.unified_main_window import UnifiedMainWindow
 from .core.database import DatabaseManager
-from .ui.simple_password_dialog import SimplePasswordDialog
+from .ui.password_dialog import PasswordDialog
+from .ui.language_selector_dialog import select_language_on_startup
+from .utils.language_manager import get_language_manager
 
 
 def _create_basic_app_icon(app: QApplication) -> None:
@@ -50,16 +52,31 @@ def main() -> int:
     os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 
     app = QApplication(sys.argv)
-    app.setApplicationName("Psychological Records – Simple")
+    app.setApplicationName("Psychological Records")
     app.setOrganizationName("Psychological Practice Management")
-    app.setApplicationVersion("0.1.0")
+    app.setApplicationVersion("0.5.0")
 
     _create_basic_app_icon(app)
+    
+    # Language selection on first run or if not set
+    settings = QSettings('PsychologicalRecords', 'UnifiedApp')
+    lang_manager = get_language_manager()
+    
+    # Check if language has been set before
+    if not settings.contains('language_configured'):
+        # First run - show language selector
+        current_lang = lang_manager.get_current_language()
+        selected_lang = select_language_on_startup(current_lang)
+        lang_manager.change_language(selected_lang)
+        settings.setValue('language_configured', True)
+    else:
+        # Load saved language preference
+        lang_manager.load_language_preference()
 
     # Database unlock/initialize flow
     db = DatabaseManager()
     initializing = not os.path.exists(db.encrypted_db_path)
-    pwd_dialog = SimplePasswordDialog(initializing)
+    pwd_dialog = PasswordDialog(initializing)
     if pwd_dialog.exec() != pwd_dialog.DialogCode.Accepted:
         return 0
     password = pwd_dialog.get_password()
@@ -80,7 +97,7 @@ def main() -> int:
     except Exception:
         pass
 
-    window = SimpleMainWindow()
+    window = UnifiedMainWindow()
     window.db = db
     window.attach_db_and_load()
     window.show()
