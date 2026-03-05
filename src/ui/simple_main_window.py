@@ -22,12 +22,12 @@ from PyQt6.QtWidgets import (
 )
 
 
-from .simple_add_patient_dialog import SimpleAddPatientDialog
-from .simple_add_checkup_dialog import SimpleAddCheckupDialog
-from .simple_add_session_dialog import SimpleAddSessionDialog
-from .simple_edit_checkup_dialog import SimpleEditCheckupDialog
-from .simple_edit_session_dialog import SimpleEditSessionDialog
-from .simple_select_record_dialog import SimpleSelectRecordDialog
+from .add_patient_dialog import AddPatientDialog
+from .add_checkup_dialog import AddCheckupDialog
+from .add_session_dialog import AddSessionDialog
+from .edit_checkup_dialog import EditCheckupDialog
+from .edit_session_dialog import EditSessionDialog
+from .select_record_dialog import SelectRecordDialog
 from ..utils.pdf_generator import generate_psychological_report
 from ..utils.language_manager import get_language_manager, get_text as _t
 
@@ -143,7 +143,7 @@ class SimpleMainWindow(QMainWindow):
     def add_patient(self) -> None:
         if getattr(self, "db", None) is None:
             return
-        dialog = SimpleAddPatientDialog(self)
+        dialog = AddPatientDialog(self)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         name, cnp = dialog.get_values()
@@ -202,7 +202,7 @@ class SimpleMainWindow(QMainWindow):
         if person_id is None:
             self.statusBar().showMessage(_t('main_window.select_person_records', 'Select a patient first'), 2000)
             return
-        dialog = SimpleAddCheckupDialog(self)
+        dialog = AddCheckupDialog(self)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         v = dialog.get_values()
@@ -229,7 +229,7 @@ class SimpleMainWindow(QMainWindow):
         if person_id is None:
             self.statusBar().showMessage(_t('main_window.select_person_records', 'Select a patient first'), 2000)
             return
-        dialog = SimpleAddSessionDialog(self)
+        dialog = AddSessionDialog(self)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         v = dialog.get_values()
@@ -259,7 +259,7 @@ class SimpleMainWindow(QMainWindow):
             return
         assessments = self.db.get_assessments_for_person(person_id)
         items = [(a[0], f"{a[1]} - {a[5] or 'No diagnosis'}") for a in assessments]
-        dlg = SimpleSelectRecordDialog("Select Checkup", items, self)
+        dlg = SelectRecordDialog("Select Checkup", items, self)
         if dlg.exec() != dlg.DialogCode.Accepted:
             return
         rec_id = dlg.get_selected_id()
@@ -268,7 +268,7 @@ class SimpleMainWindow(QMainWindow):
         current = next((a for a in assessments if a[0] == rec_id), None)
         if not current:
             return
-        edit = SimpleEditCheckupDialog(current, self)
+        edit = EditCheckupDialog(current, self)
         if edit.exec() != edit.DialogCode.Accepted:
             return
         v = edit.get_values()
@@ -294,7 +294,7 @@ class SimpleMainWindow(QMainWindow):
             return
         consultations = self.db.get_consultations_for_person(person_id)
         items = [(c[0], f"{c[1]} - {c[2]}") for c in consultations]
-        dlg = SimpleSelectRecordDialog("Select Session", items, self)
+        dlg = SelectRecordDialog("Select Session", items, self)
         if dlg.exec() != dlg.DialogCode.Accepted:
             return
         rec_id = dlg.get_selected_id()
@@ -303,7 +303,7 @@ class SimpleMainWindow(QMainWindow):
         current = next((c for c in consultations if c[0] == rec_id), None)
         if not current:
             return
-        edit = SimpleEditSessionDialog(current, self)
+        edit = EditSessionDialog(current, self)
         if edit.exec() != edit.DialogCode.Accepted:
             return
         v = edit.get_values()
