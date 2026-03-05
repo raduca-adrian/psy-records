@@ -27,9 +27,10 @@ from PyQt6.QtWidgets import (
     QListWidget,
     QScrollArea,
     QFrame,
+    QSpinBox,
 )
 
-from ..utils.pdf_generator import generate_psychological_report
+from ..utils.pdf_generator import generate_psychological_report, generate_medical_consultation_form
 from ..utils.language_manager import get_language_manager, get_text as _t
 from ..utils.material_theme import get_material_stylesheet, get_theme_toggle_button_style
 from ..utils.material_elevation import apply_card_elevation
@@ -76,6 +77,7 @@ class UnifiedMainWindow(QMainWindow):
         self._create_add_patient_tab()
         self._create_checkup_tab()
         self._create_session_tab()
+        self._create_medical_form_tab()
         
         # Initially disable tabs that require patient selection
         self._update_tab_accessibility()
@@ -207,6 +209,8 @@ class UnifiedMainWindow(QMainWindow):
         new_checkup_btn.clicked.connect(self.start_add_checkup)
         new_session_btn = QPushButton('➕ New Session', right_panel)
         new_session_btn.clicked.connect(self.start_add_session)
+        new_medical_form_btn = QPushButton('📝 Medical Form', right_panel)
+        new_medical_form_btn.clicked.connect(self.start_medical_form)
         edit_checkup_btn = QPushButton('✏️ Edit Checkup', right_panel)
         edit_checkup_btn.clicked.connect(self.start_edit_checkup)
         edit_session_btn = QPushButton('✏️ Edit Session', right_panel)
@@ -214,6 +218,7 @@ class UnifiedMainWindow(QMainWindow):
         
         action_buttons.addWidget(new_checkup_btn)
         action_buttons.addWidget(new_session_btn)
+        action_buttons.addWidget(new_medical_form_btn)
         action_buttons.addWidget(edit_checkup_btn)
         action_buttons.addWidget(edit_session_btn)
         action_buttons.addStretch(1)
@@ -490,6 +495,139 @@ class UnifiedMainWindow(QMainWindow):
 
         self.tabs.addTab(scroll, "💬 " + _t('tabs.session', 'Session'))
 
+    def _create_medical_form_tab(self) -> None:
+        """Create the adult medical consultation form tab."""
+        tab = QWidget()
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(tab)
+        
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
+
+        self.medical_title_label = QLabel("Adult Medical Consultation Form", tab)
+        self.medical_title_label.setProperty("class", "h1")
+        layout.addWidget(self.medical_title_label)
+
+        # Patient info display
+        self.medical_patient_label = QLabel(NO_PATIENT_SELECTED_TITLE, tab)
+        self.medical_patient_label.setWordWrap(True)
+        layout.addWidget(self.medical_patient_label)
+
+        form_frame = QFrame(tab)
+        form_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        form_layout = QVBoxLayout(form_frame)
+        form_layout.setSpacing(12)
+
+        # Location / unit info
+        form_layout.addWidget(QLabel("County (Județ)", form_frame))
+        self.medical_county_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_county_edit)
+
+        form_layout.addWidget(QLabel("Locality (Localitatea)", form_frame))
+        self.medical_locality_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_locality_edit)
+
+        form_layout.addWidget(QLabel("Health Unit (Unitatea sanitară)", form_frame))
+        self.medical_health_unit_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_health_unit_edit)
+
+        # Registration / occupation
+        form_layout.addWidget(QLabel("Registration Date", form_frame))
+        self.medical_registration_date_edit = QDateEdit(form_frame)
+        self.medical_registration_date_edit.setCalendarPopup(True)
+        self.medical_registration_date_edit.setDate(QDate.currentDate())
+        form_layout.addWidget(self.medical_registration_date_edit)
+
+        form_layout.addWidget(QLabel("Occupation", form_frame))
+        self.medical_occupation_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_occupation_edit)
+
+        form_layout.addWidget(QLabel("Workplace", form_frame))
+        self.medical_workplace_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_workplace_edit)
+
+        form_layout.addWidget(QLabel("Workplace Address", form_frame))
+        self.medical_work_address_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_work_address_edit)
+
+        form_layout.addWidget(QLabel("Working Conditions (Condiții de muncă)", form_frame))
+        self.medical_work_conditions_edit = QTextEdit(form_frame)
+        self.medical_work_conditions_edit.setMaximumHeight(80)
+        form_layout.addWidget(self.medical_work_conditions_edit)
+
+        # Antecedents
+        form_layout.addWidget(QLabel("Hereditary History (Antecedente heredo-colaterale)", form_frame))
+        self.medical_hereditary_edit = QTextEdit(form_frame)
+        self.medical_hereditary_edit.setMaximumHeight(80)
+        form_layout.addWidget(self.medical_hereditary_edit)
+
+        form_layout.addWidget(QLabel("Personal History (Antecedente personale)", form_frame))
+        self.medical_personal_history_edit = QTextEdit(form_frame)
+        self.medical_personal_history_edit.setMaximumHeight(80)
+        form_layout.addWidget(self.medical_personal_history_edit)
+
+        # Consultation details
+        form_layout.addWidget(QLabel("Consultation Date *", form_frame))
+        self.medical_consultation_date_edit = QDateEdit(form_frame)
+        self.medical_consultation_date_edit.setCalendarPopup(True)
+        self.medical_consultation_date_edit.setDate(QDate.currentDate())
+        form_layout.addWidget(self.medical_consultation_date_edit)
+
+        form_layout.addWidget(QLabel("Symptoms (Simptome)", form_frame))
+        self.medical_symptoms_edit = QTextEdit(form_frame)
+        self.medical_symptoms_edit.setMaximumHeight(100)
+        form_layout.addWidget(self.medical_symptoms_edit)
+
+        form_layout.addWidget(QLabel("Diagnosis (Diagnostic)", form_frame))
+        self.medical_diagnosis_edit = QTextEdit(form_frame)
+        self.medical_diagnosis_edit.setMaximumHeight(100)
+        form_layout.addWidget(self.medical_diagnosis_edit)
+
+        form_layout.addWidget(QLabel("ICD Code (Cod)", form_frame))
+        self.medical_icd_code_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_icd_code_edit)
+
+        form_layout.addWidget(QLabel("Prescriptions / Recommendations", form_frame))
+        self.medical_prescriptions_edit = QTextEdit(form_frame)
+        self.medical_prescriptions_edit.setMaximumHeight(100)
+        form_layout.addWidget(self.medical_prescriptions_edit)
+
+        form_layout.addWidget(QLabel("Sick Leave Days (Zile concediu medical)", form_frame))
+        self.medical_sick_days_spin = QSpinBox(form_frame)
+        self.medical_sick_days_spin.setRange(0, 365)
+        form_layout.addWidget(self.medical_sick_days_spin)
+
+        form_layout.addWidget(QLabel("Certificate Number (Nr. certificat)", form_frame))
+        self.medical_certificate_edit = QLineEdit(form_frame)
+        form_layout.addWidget(self.medical_certificate_edit)
+
+        form_layout.addWidget(QLabel("Notes", form_frame))
+        self.medical_notes_edit = QTextEdit(form_frame)
+        self.medical_notes_edit.setMaximumHeight(80)
+        form_layout.addWidget(self.medical_notes_edit)
+
+        # Buttons
+        button_row = QHBoxLayout()
+        clear_btn = QPushButton("Clear", form_frame)
+        clear_btn.clicked.connect(self.clear_medical_form)
+        save_btn = QPushButton("Save & Export PDF", form_frame)
+        save_btn.setProperty("class", "primary")
+        save_btn.clicked.connect(self.save_medical_form)
+
+        button_row.addWidget(clear_btn)
+        button_row.addWidget(save_btn)
+        button_row.addStretch(1)
+        form_layout.addLayout(button_row)
+
+        self.medical_form_frame = form_frame
+
+        layout.addWidget(form_frame)
+        layout.addStretch(1)
+
+        self.tabs.addTab(scroll, "📝 " + _t('tabs.medical_form', 'Medical Form'))
+
     def _setup_shortcuts(self) -> None:
         """Set up keyboard shortcuts for quick navigation."""
         # Tab navigation shortcuts
@@ -497,6 +635,7 @@ class UnifiedMainWindow(QMainWindow):
         QShortcut(QKeySequence("Ctrl+2"), self, lambda: self.tabs.setCurrentIndex(1))
         QShortcut(QKeySequence("Ctrl+3"), self, lambda: self.tabs.setCurrentIndex(2))
         QShortcut(QKeySequence("Ctrl+4"), self, lambda: self.tabs.setCurrentIndex(3))
+        QShortcut(QKeySequence("Ctrl+5"), self, lambda: self.tabs.setCurrentIndex(4))
         
         # Quick actions
         QShortcut(QKeySequence("Ctrl+N"), self, lambda: self.tabs.setCurrentIndex(1))  # New patient
@@ -527,6 +666,8 @@ class UnifiedMainWindow(QMainWindow):
             apply_card_elevation(self.session_form_frame, dark_mode)
         if hasattr(self, 'patient_info_frame'):
             apply_card_elevation(self.patient_info_frame, dark_mode)
+        if hasattr(self, 'medical_form_frame'):
+            apply_card_elevation(self.medical_form_frame, dark_mode)
         
         # Update button text
         self._update_theme_button_text()
@@ -577,6 +718,7 @@ class UnifiedMainWindow(QMainWindow):
         self.tabs.setTabText(1, "➕ " + _t('tabs.add_patient', 'Add Patient'))
         self.tabs.setTabText(2, "🩺 " + _t('tabs.checkup', 'Checkup'))
         self.tabs.setTabText(3, "💬 " + _t('tabs.session', 'Session'))
+        self.tabs.setTabText(4, "📝 " + _t('tabs.medical_form', 'Medical Form'))
         
         # Update buttons and labels
         self.language_btn.setText(f"🌍 {self.language_manager.get_language_display_name(self.language_manager.get_current_language())}")
@@ -594,23 +736,26 @@ class UnifiedMainWindow(QMainWindow):
         """Enable or disable tabs based on whether a patient is selected."""
         has_patient = self.current_patient_id is not None
         
-        # Tabs that require a patient selection: Checkup (index 2) and Session (index 3)
+        # Tabs that require a patient selection: Checkup (index 2), Session (index 3), Medical Form (index 4)
         self.tabs.setTabEnabled(2, has_patient)  # Checkup tab
         self.tabs.setTabEnabled(3, has_patient)  # Session tab
+        self.tabs.setTabEnabled(4, has_patient)  # Medical form tab
         
         # Update tab tooltips
         if not has_patient:
             self.tabs.setTabToolTip(2, _t('tabs.checkup_disabled', 'Select a patient first to add/edit checkups'))
             self.tabs.setTabToolTip(3, _t('tabs.session_disabled', 'Select a patient first to add/edit sessions'))
+            self.tabs.setTabToolTip(4, _t('tabs.medical_form_disabled', 'Select a patient first to complete medical consultation forms'))
         else:
             self.tabs.setTabToolTip(2, _t('tabs.checkup_tooltip', 'Add or edit medical checkups for the selected patient'))
             self.tabs.setTabToolTip(3, _t('tabs.session_tooltip', 'Add or edit therapy sessions for the selected patient'))
+            self.tabs.setTabToolTip(4, _t('tabs.medical_form_tooltip', 'Record and export adult medical consultation forms for the selected patient'))
     
     def _on_tab_changed(self, index: int) -> None:
         """Handle tab changes."""
         # If user tries to access a patient-dependent tab without selecting a patient,
         # show a message and switch back to patients tab
-        if index in (2, 3) and self.current_patient_id is None:
+        if index in (2, 3, 4) and self.current_patient_id is None:
             QMessageBox.information(
                 self,
                 _t('common.select_patient_first', 'No Patient Selected'),
@@ -657,7 +802,8 @@ class UnifiedMainWindow(QMainWindow):
             record = self.db.get_person_complete_record(pid)
             checkup_count = len(record.get("assessments", [])) if record else 0
             session_count = len(record.get("consultations", [])) if record else 0
-            total_records = checkup_count + session_count
+            form_count = len(record.get("medical_forms", [])) if record else 0
+            total_records = checkup_count + session_count + form_count
             
             records_item = QTableWidgetItem(f"{total_records}")
             records_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -702,12 +848,13 @@ class UnifiedMainWindow(QMainWindow):
         person = record.get("person")
         assessments = record.get("assessments", [])
         consultations = record.get("consultations", [])
+        medical_forms = record.get("medical_forms", [])
 
         # Update patient info card
         self.patient_name_label.setText(person[1])
         self.patient_details_label.setText(
             f"CNP: {person[2]} | Registered: {person[3][:10] if person[3] else 'Unknown'} | "
-            f"Records: {len(assessments) + len(consultations)} total"
+            f"Records: {len(assessments) + len(consultations) + len(medical_forms)} total"
         )
 
         # Build detailed records view with HTML formatting
@@ -745,6 +892,51 @@ class UnifiedMainWindow(QMainWindow):
                 html_lines.append("</div>")
         else:
             html_lines.append("<p><em>No therapy sessions recorded</em></p>")
+        
+        # Adult medical consultation forms section
+        html_lines.append(f"<h3 style='color: #9C27B0; margin-top: 20px;'>📝 Medical Forms ({len(medical_forms)})</h3>")
+        if medical_forms:
+            for f_rec in medical_forms:
+                (
+                    form_id,
+                    _person_id,
+                    county,
+                    locality,
+                    health_unit,
+                    registration_date,
+                    occupation,
+                    workplace,
+                    work_address,
+                    work_conditions,
+                    hereditary_history,
+                    personal_history,
+                    consultation_date,
+                    symptoms,
+                    diagnosis,
+                    icd_code,
+                    prescriptions,
+                    recommendations,
+                    sick_leave_days,
+                    certificate_number,
+                    notes,
+                    created_at,
+                    updated_at,
+                ) = f_rec
+                html_lines.append("<div style='margin: 10px 0; padding: 10px; background: rgba(156, 39, 176, 0.05); border-left: 3px solid #9C27B0;'>")
+                html_lines.append(f"<strong>Date consultație:</strong> {consultation_date or 'N/A'}<br>")
+                html_lines.append(f"<strong>Unitate sanitară:</strong> {health_unit or 'N/A'}<br>")
+                html_lines.append(f"<strong>Simptome:</strong> {symptoms or 'N/A'}<br>")
+                html_lines.append(f"<strong>Diagnostic:</strong> {diagnosis or 'N/A'} (cod: {icd_code or '-'})<br>")
+                html_lines.append(f"<strong>Prescrieri / Recomandări:</strong> {prescriptions or recommendations or 'N/A'}<br>")
+                if sick_leave_days is not None:
+                    html_lines.append(f"<strong>Zile concediu medical:</strong> {sick_leave_days}<br>")
+                if certificate_number:
+                    html_lines.append(f"<strong>Nr. certificat:</strong> {certificate_number}<br>")
+                if notes:
+                    html_lines.append(f"<strong>Note:</strong> {notes}")
+                html_lines.append("</div>")
+        else:
+            html_lines.append("<p><em>No medical forms recorded</em></p>")
         
         html_lines.append("</body></html>")
         self.records_view.setHtml("\n".join(html_lines))
@@ -1044,6 +1236,148 @@ class UnifiedMainWindow(QMainWindow):
         self.clear_session_form()
         self.load_records_for_selected()
         self.tabs.setCurrentIndex(0)  # Go back to patients tab
+
+    # ===== Adult Medical Consultation Form Management =====
+
+    def start_medical_form(self) -> None:
+        """Start filling a new adult medical consultation form."""
+        if self.current_patient_id is None:
+            QMessageBox.warning(self, NO_PATIENT_TITLE, SELECT_PATIENT_MSG)
+            return
+
+        self.clear_medical_form()
+        self._update_medical_patient_label()
+        self.tabs.setCurrentIndex(4)  # Medical form tab
+
+    def _update_medical_patient_label(self) -> None:
+        """Update the patient info label in the medical form tab."""
+        if self.current_patient_id and hasattr(self, "db"):
+            record = self.db.get_person_complete_record(self.current_patient_id)
+            if record:
+                person = record.get("person")
+                self.medical_patient_label.setText(f"Patient: {person[1]} (CNP: {person[2]})")
+                return
+        self.medical_patient_label.setText(NO_PATIENT_SELECTED_TITLE)
+
+    def clear_medical_form(self) -> None:
+        """Clear the adult medical consultation form."""
+        self.medical_county_edit.clear()
+        self.medical_locality_edit.clear()
+        self.medical_health_unit_edit.clear()
+        self.medical_registration_date_edit.setDate(QDate.currentDate())
+        self.medical_occupation_edit.clear()
+        self.medical_workplace_edit.clear()
+        self.medical_work_address_edit.clear()
+        self.medical_work_conditions_edit.clear()
+        self.medical_hereditary_edit.clear()
+        self.medical_personal_history_edit.clear()
+        self.medical_consultation_date_edit.setDate(QDate.currentDate())
+        self.medical_symptoms_edit.clear()
+        self.medical_diagnosis_edit.clear()
+        self.medical_icd_code_edit.clear()
+        self.medical_prescriptions_edit.clear()
+        self.medical_sick_days_spin.setValue(0)
+        self.medical_certificate_edit.clear()
+        self.medical_notes_edit.clear()
+
+    def save_medical_form(self) -> None:
+        """Save the medical form to the database and export a PDF."""
+        if getattr(self, "db", None) is None or self.current_patient_id is None:
+            return
+
+        consultation_date = self.medical_consultation_date_edit.date().toString("yyyy-MM-dd")
+        if not consultation_date:
+            QMessageBox.warning(self, "Required Fields", "Consultation date is required.")
+            return
+
+        county = self.medical_county_edit.text().strip()
+        locality = self.medical_locality_edit.text().strip()
+        health_unit = self.medical_health_unit_edit.text().strip()
+        registration_date = self.medical_registration_date_edit.date().toString("yyyy-MM-dd")
+        occupation = self.medical_occupation_edit.text().strip()
+        workplace = self.medical_workplace_edit.text().strip()
+        work_address = self.medical_work_address_edit.text().strip()
+        work_conditions = self.medical_work_conditions_edit.toPlainText().strip()
+        hereditary_history = self.medical_hereditary_edit.toPlainText().strip()
+        personal_history = self.medical_personal_history_edit.toPlainText().strip()
+        symptoms = self.medical_symptoms_edit.toPlainText().strip()
+        diagnosis = self.medical_diagnosis_edit.toPlainText().strip()
+        icd_code = self.medical_icd_code_edit.text().strip()
+        prescriptions = self.medical_prescriptions_edit.toPlainText().strip()
+        sick_leave_days = self.medical_sick_days_spin.value()
+        certificate_number = self.medical_certificate_edit.text().strip()
+        notes = self.medical_notes_edit.toPlainText().strip()
+
+        sick_leave_days_value = sick_leave_days if sick_leave_days > 0 else None
+
+        if not self.db.add_adult_medical_consultation(
+            self.current_patient_id,
+            consultation_date,
+            county=county,
+            locality=locality,
+            health_unit=health_unit,
+            registration_date=registration_date,
+            occupation=occupation,
+            workplace=workplace,
+            work_address=work_address,
+            work_conditions=work_conditions,
+            hereditary_history=hereditary_history,
+            personal_history=personal_history,
+            symptoms=symptoms,
+            diagnosis=diagnosis,
+            icd_code=icd_code,
+            prescriptions=prescriptions,
+            recommendations="",
+            sick_leave_days=sick_leave_days_value,
+            certificate_number=certificate_number,
+            notes=notes,
+        ):
+            QMessageBox.critical(self, "Error", "Failed to save medical consultation form.")
+            return
+
+        # Generate PDF based on current data
+        record = self.db.get_person_complete_record(self.current_patient_id)
+        person = record.get("person") if record else None
+        if not person:
+            QMessageBox.critical(self, "Error", "Failed to load patient details for PDF.")
+            return
+
+        form_data = {
+            "county": county,
+            "locality": locality,
+            "health_unit": health_unit,
+            "registration_date": registration_date,
+            "occupation": occupation,
+            "workplace": workplace,
+            "work_address": work_address,
+            "work_conditions": work_conditions,
+            "hereditary_history": hereditary_history,
+            "personal_history": personal_history,
+            "consultation_date": consultation_date,
+            "symptoms": symptoms,
+            "diagnosis": diagnosis,
+            "icd_code": icd_code,
+            "prescriptions": prescriptions,
+            "recommendations": "",
+            "sick_leave_days": sick_leave_days_value,
+            "certificate_number": certificate_number,
+            "notes": notes,
+        }
+
+        out_dir = "data"
+        os.makedirs(out_dir, exist_ok=True)
+        safe_name = (person[1] or "patient").replace(" ", "_")
+        pdf_path = os.path.join(out_dir, f"MedicalForm_{safe_name}_{consultation_date}.pdf")
+
+        try:
+            generate_medical_consultation_form(person, form_data, pdf_path)
+            self.statusBar().showMessage(f"Medical consultation form saved and exported → {pdf_path}", 3000)
+        except Exception:
+            self.statusBar().showMessage("Failed to export medical consultation PDF", 3000)
+
+        self.clear_medical_form()
+        self.load_records_for_selected()
+        self.tabs.setCurrentIndex(0)
 
     # ===== PDF Export =====
 

@@ -14,7 +14,6 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from .ui.unified_main_window import UnifiedMainWindow
 from .core.database import DatabaseManager
-from .ui.password_dialog import PasswordDialog
 from .ui.language_selector_dialog import select_language_on_startup
 from .utils.language_manager import get_language_manager
 
@@ -73,29 +72,17 @@ def main() -> int:
         # Load saved language preference
         lang_manager.load_language_preference()
 
-    # Database unlock/initialize flow
+    # Database initialize flow (no password required in simplified mode)
     db = DatabaseManager()
-    initializing = not os.path.exists(db.encrypted_db_path)
-    pwd_dialog = PasswordDialog(initializing)
-    if pwd_dialog.exec() != pwd_dialog.DialogCode.Accepted:
-        return 0
-    password = pwd_dialog.get_password()
-
+    initializing = not os.path.exists(db.db_path)
     if initializing:
-        if not db.initialize_database(password):
+        if not db.initialize_database():
             QMessageBox.critical(None, "Database Error", "Failed to initialize database.")
             return 1
 
-    if not db.connect(password):
-        QMessageBox.critical(None, "Database Error", "Invalid password or database error.")
+    if not db.connect():
+        QMessageBox.critical(None, "Database Error", "Failed to connect to database.")
         return 1
-
-    # Ensure an initial user exists for completeness (optional, but harmless)
-    try:
-        if not db.user_exists("admin"):
-            db.create_user("admin", password)
-    except Exception:
-        pass
 
     window = UnifiedMainWindow()
     window.db = db

@@ -33,35 +33,24 @@ class DatabaseManager:
         key = self._derive_key(password, salt)
         return Fernet(key)
     
-    def connect(self, password: str) -> bool:
-        """Connect to the encrypted database with the given password."""
+    def connect(self, password: Optional[str] = None) -> bool:
+        """
+        Connect to the database.
+
+        In this simplified version the database is stored unencrypted and no
+        user-supplied password is required. The password argument is accepted
+        for backwards compatibility but ignored.
+        """
         try:
-            self.fernet = self._get_fernet(password)
-            
-            # If encrypted file exists, decrypt it first
-            if os.path.exists(self.encrypted_db_path):
-                with open(self.encrypted_db_path, 'rb') as f:
-                    encrypted_data = f.read()
-                
-                try:
-                    decrypted_data = self.fernet.decrypt(encrypted_data)
-                    with open(self.db_path, 'wb') as f:
-                        f.write(decrypted_data)
-                except Exception:
-                    return False  # Wrong password
-            
-            # Connect to SQLite database
+            # Plain SQLite connection
             self.connection = sqlite3.connect(self.db_path)
-            self.db_password = password
-            
-            # Test the connection
-            self.connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            self.db_password = None
             
             # Create tables if they don't exist
             self._create_tables()
             
-            # Encrypt and save the database
-            self._encrypt_and_save()
+            # Test the connection
+            self.connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
             
             return True
         except Exception as e:
@@ -72,20 +61,8 @@ class DatabaseManager:
             return False
     
     def _encrypt_and_save(self):
-        """Encrypt the database file"""
-        if self.fernet and os.path.exists(self.db_path):
-            with open(self.db_path, 'rb') as f:
-                data = f.read()
-            
-            encrypted_data = self.fernet.encrypt(data)
-            with open(self.encrypted_db_path, 'wb') as f:
-                f.write(encrypted_data)
-            
-            # Remove unencrypted file
-            try:
-                os.remove(self.db_path)
-            except OSError:
-                pass
+        """Encrypt the database file (no-op in simplified mode)."""
+        return
     
     def _create_tables(self):
         """Create necessary tables if they don't exist."""
@@ -149,6 +126,36 @@ class DatabaseManager:
             )
         """)
         
+        # Create adult medical consultations table matching the MED-style form
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS adult_medical_consultations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                person_id INTEGER NOT NULL,
+                county TEXT,
+                locality TEXT,
+                health_unit TEXT,
+                registration_date DATE,
+                occupation TEXT,
+                workplace TEXT,
+                work_address TEXT,
+                work_conditions TEXT,
+                hereditary_history TEXT,
+                personal_history TEXT,
+                consultation_date DATE NOT NULL,
+                symptoms TEXT,
+                diagnosis TEXT,
+                icd_code TEXT,
+                prescriptions TEXT,
+                recommendations TEXT,
+                sick_leave_days INTEGER,
+                certificate_number TEXT,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (person_id) REFERENCES persons (id) ON DELETE CASCADE
+            )
+        """)
+        
         self.connection.commit()
     
     def create_user(self, username: str, password: str) -> bool:
@@ -158,7 +165,9 @@ class DatabaseManager:
         
         try:
             # Hash the password
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            password_hash_bytes = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            # Store as UTF-8 text to be consistent with the TEXT column type
+            password_hash = password_hash_bytes.decode('utf-8')
             
             cursor = self.connection.cursor()
             cursor.execute(
@@ -188,6 +197,8 @@ class DatabaseManager:
             
             if result:
                 stored_hash = result[0]
+                if isinstance(stored_hash, str):
+                    stored_hash = stored_hash.encode('utf-8')
                 return bcrypt.checkpw(password.encode('utf-8'), stored_hash)
             return False
         except Exception as e:
@@ -205,7 +216,8 @@ class DatabaseManager:
         
         try:
             # Hash the new password
-            new_password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            new_password_hash_bytes = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            new_password_hash = new_password_hash_bytes.decode('utf-8')
             
             cursor = self.connection.cursor()
             cursor.execute(
@@ -298,29 +310,32 @@ class DatabaseManager:
     def close(self):
         """Close the database connection."""
         if self.connection:
-            # Encrypt and save before closing
-            self._encrypt_and_save()
+            # Ensure all changes are flushed
+            try:
+                self.connection.commit()
+            except Exception:
+                pass
+            # Close the connection to release file handles (important on Windows)
             self.connection.close()
             self.connection = None
     
-    def initialize_database(self, password: str) -> bool:
-        """Initialize a new encrypted database."""
+    def initialize_database(self, password: Optional[str] = None) -> bool:
+        """
+        Initialize a new database file.
+
+        Password is ignored in this simplified, unencrypted mode.
+        """
         try:
-            # Create new database file
-            if os.path.exists(self.encrypted_db_path):
+            # Create new database file only if it does not already exist
+            if os.path.exists(self.db_path):
                 return False  # Database already exists
             
-            # Create temporary SQLite database
             conn = sqlite3.connect(self.db_path)
             
             # Create a test table to ensure the database is properly created
             conn.execute("CREATE TABLE test_table (id INTEGER)")
             conn.execute("DROP TABLE test_table")
             conn.close()
-            
-            # Now encrypt it
-            self.fernet = self._get_fernet(password)
-            self._encrypt_and_save()
             
             return True
         except Exception as e:
@@ -550,7 +565,7 @@ class DatabaseManager:
             return False
     
     def get_person_complete_record(self, person_id: int) -> dict:
-        """Get complete medical record for a person including assessments and consultations."""
+        """Get complete medical record for a person including assessments, consultations, and adult medical forms."""
         if not self.connection:
             return {}
         
@@ -570,11 +585,236 @@ class DatabaseManager:
             # Get consultations
             consultations = self.get_consultations_for_person(person_id)
             
+            # Get adult medical consultation forms
+            medical_forms = self.get_adult_medical_consultations_for_person(person_id)
+            
             return {
                 'person': person,
                 'assessments': assessments,
-                'consultations': consultations
+                'consultations': consultations,
+                'medical_forms': medical_forms,
             }
         except Exception as e:
             print(f"Error getting complete record: {e}")
             return {}
+
+    # Adult medical consultation (MED-style) management methods
+    def add_adult_medical_consultation(
+        self,
+        person_id: int,
+        consultation_date: str,
+        county: str = "",
+        locality: str = "",
+        health_unit: str = "",
+        registration_date: Optional[str] = None,
+        occupation: str = "",
+        workplace: str = "",
+        work_address: str = "",
+        work_conditions: str = "",
+        hereditary_history: str = "",
+        personal_history: str = "",
+        symptoms: str = "",
+        diagnosis: str = "",
+        icd_code: str = "",
+        prescriptions: str = "",
+        recommendations: str = "",
+        sick_leave_days: Optional[int] = None,
+        certificate_number: str = "",
+        notes: str = "",
+    ) -> bool:
+        """Add a new adult medical consultation record for a person."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                INSERT INTO adult_medical_consultations (
+                    person_id,
+                    county,
+                    locality,
+                    health_unit,
+                    registration_date,
+                    occupation,
+                    workplace,
+                    work_address,
+                    work_conditions,
+                    hereditary_history,
+                    personal_history,
+                    consultation_date,
+                    symptoms,
+                    diagnosis,
+                    icd_code,
+                    prescriptions,
+                    recommendations,
+                    sick_leave_days,
+                    certificate_number,
+                    notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    person_id,
+                    county,
+                    locality,
+                    health_unit,
+                    registration_date,
+                    occupation,
+                    workplace,
+                    work_address,
+                    work_conditions,
+                    hereditary_history,
+                    personal_history,
+                    consultation_date,
+                    symptoms,
+                    diagnosis,
+                    icd_code,
+                    prescriptions,
+                    recommendations,
+                    sick_leave_days,
+                    certificate_number,
+                    notes,
+                ),
+            )
+            self.connection.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding adult medical consultation: {e}")
+            return False
+
+    def get_adult_medical_consultations_for_person(self, person_id: int) -> List[Tuple]:
+        """Get all adult medical consultation records for a specific person."""
+        if not self.connection:
+            return []
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    person_id,
+                    county,
+                    locality,
+                    health_unit,
+                    registration_date,
+                    occupation,
+                    workplace,
+                    work_address,
+                    work_conditions,
+                    hereditary_history,
+                    personal_history,
+                    consultation_date,
+                    symptoms,
+                    diagnosis,
+                    icd_code,
+                    prescriptions,
+                    recommendations,
+                    sick_leave_days,
+                    certificate_number,
+                    notes,
+                    created_at,
+                    updated_at
+                FROM adult_medical_consultations
+                WHERE person_id = ?
+                ORDER BY consultation_date DESC, created_at DESC
+                """,
+                (person_id,),
+            )
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error getting adult medical consultations: {e}")
+            return []
+
+    def update_adult_medical_consultation(
+        self,
+        consultation_id: int,
+        consultation_date: Optional[str] = None,
+        county: Optional[str] = None,
+        locality: Optional[str] = None,
+        health_unit: Optional[str] = None,
+        registration_date: Optional[str] = None,
+        occupation: Optional[str] = None,
+        workplace: Optional[str] = None,
+        work_address: Optional[str] = None,
+        work_conditions: Optional[str] = None,
+        hereditary_history: Optional[str] = None,
+        personal_history: Optional[str] = None,
+        symptoms: Optional[str] = None,
+        diagnosis: Optional[str] = None,
+        icd_code: Optional[str] = None,
+        prescriptions: Optional[str] = None,
+        recommendations: Optional[str] = None,
+        sick_leave_days: Optional[int] = None,
+        certificate_number: Optional[str] = None,
+        notes: Optional[str] = None,
+    ) -> bool:
+        """Update an existing adult medical consultation record."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            updates = []
+            values: List = []
+            
+            def _add_update(field: str, value):
+                if value is not None:
+                    updates.append(f"{field} = ?")
+                    values.append(value)
+            
+            _add_update("consultation_date", consultation_date)
+            _add_update("county", county)
+            _add_update("locality", locality)
+            _add_update("health_unit", health_unit)
+            _add_update("registration_date", registration_date)
+            _add_update("occupation", occupation)
+            _add_update("workplace", workplace)
+            _add_update("work_address", work_address)
+            _add_update("work_conditions", work_conditions)
+            _add_update("hereditary_history", hereditary_history)
+            _add_update("personal_history", personal_history)
+            _add_update("symptoms", symptoms)
+            _add_update("diagnosis", diagnosis)
+            _add_update("icd_code", icd_code)
+            _add_update("prescriptions", prescriptions)
+            _add_update("recommendations", recommendations)
+            _add_update("sick_leave_days", sick_leave_days)
+            _add_update("certificate_number", certificate_number)
+            _add_update("notes", notes)
+            
+            if not updates:
+                return True  # Nothing to update
+            
+            updates.append("updated_at = CURRENT_TIMESTAMP")
+            values.append(consultation_id)
+            
+            query = f"""
+                UPDATE adult_medical_consultations
+                SET {', '.join(updates)}
+                WHERE id = ?
+            """
+            cursor.execute(query, values)
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating adult medical consultation: {e}")
+            return False
+
+    def delete_adult_medical_consultation(self, consultation_id: int) -> bool:
+        """Delete an adult medical consultation record."""
+        if not self.connection:
+            return False
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "DELETE FROM adult_medical_consultations WHERE id = ?",
+                (consultation_id,),
+            )
+            self.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error deleting adult medical consultation: {e}")
+            return False
