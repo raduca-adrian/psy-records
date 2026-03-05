@@ -303,10 +303,13 @@
     "add_patient": "Add Patient",
     "checkup": "Checkup",
     "session": "Session",
+    "medical_form": "Medical Form",
     "checkup_tooltip": "Add or edit medical checkups for the selected patient",
     "session_tooltip": "Add or edit therapy sessions for the selected patient",
+    "medical_form_tooltip": "Record and export adult medical consultation forms for the selected patient",
     "checkup_disabled": "Select a patient first to add/edit checkups",
-    "session_disabled": "Select a patient first to add/edit sessions"
+    "session_disabled": "Select a patient first to add/edit sessions",
+    "medical_form_disabled": "Select a patient first to complete medical consultation forms"
   },
   "patient_form": {
     "title": "Add New Patient",
@@ -345,5 +348,37 @@
     "type_initial": "Initial",
     "type_telemedicine": "Telemedicine",
     "type_emergency": "Emergency"
+  },
+  "medical_form": {
+    "title": "Adult Medical Consultation Form",
+    "quick_button": "Medical Form",
+    "county_label": "County (Județ)",
+    "locality_label": "Locality (Localitatea)",
+    "health_unit_label": "Health Unit (Unitatea sanitară)",
+    "registration_date_label": "Registration Date",
+    "occupation_label": "Occupation",
+    "workplace_label": "Workplace",
+    "work_address_label": "Workplace Address",
+    "work_conditions_label": "Working Conditions (Condiții de muncă)",
+    "hereditary_history_label": "Hereditary History (Antecedente heredo-colaterale)",
+    "personal_history_label": "Personal History (Antecedente personale)",
+    "consultation_date_label": "Consultation Date *",
+    "symptoms_label": "Symptoms (Simptome)",
+    "diagnosis_label": "Diagnosis (Diagnostic)",
+    "icd_label": "ICD Code (Cod)",
+    "prescriptions_label": "Prescriptions / Recommendations",
+    "sick_leave_days_label": "Sick Leave Days (Zile concediu medical)",
+    "certificate_label": "Certificate Number (Nr. certificat)",
+    "notes_label": "Notes",
+    "save_export_button": "Save & Export PDF",
+    "required_date_message": "Consultation date is required.",
+    "consultations_header": "CONSULTATIONS, INVESTIGATIONS",
+    "col_date": "Date",
+    "col_symptoms": "Symptoms",
+    "col_diagnosis": "Diagnosis",
+    "col_icd": "Code",
+    "col_prescriptions": "Prescriptions / Recommendations",
+    "col_sick_days": "Sick Leave Days",
+    "col_certificate": "Certificate No."
   }
 }

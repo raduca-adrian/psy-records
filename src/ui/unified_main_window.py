@@ -87,7 +87,7 @@ class UnifiedMainWindow(QMainWindow):
 
         # Status bar with theme toggle
         status = QStatusBar(self)
-        status.showMessage("Ready")
+        status.showMessage(_t('main_window.ready', 'Ready'))
         
         # Add language switcher button to status bar
         self.language_btn = QPushButton(f"🌍 {self.language_manager.get_language_display_name(self.language_manager.get_current_language())}", self)
@@ -200,20 +200,20 @@ class UnifiedMainWindow(QMainWindow):
         right_layout.addWidget(self.patient_info_frame)
         
         # Action buttons for selected patient
-        action_label = QLabel("Quick Actions:", right_panel)
+        action_label = QLabel(_t('main_window.quick_actions', 'Quick Actions:'), right_panel)
         action_label.setProperty("class", "h3")
         right_layout.addWidget(action_label)
         
         action_buttons = QHBoxLayout()
-        new_checkup_btn = QPushButton('➕ New Checkup', right_panel)
+        new_checkup_btn = QPushButton('➕ ' + _t('common.new_checkup', 'New Checkup'), right_panel)
         new_checkup_btn.clicked.connect(self.start_add_checkup)
-        new_session_btn = QPushButton('➕ New Session', right_panel)
+        new_session_btn = QPushButton('➕ ' + _t('common.new_session', 'New Session'), right_panel)
         new_session_btn.clicked.connect(self.start_add_session)
-        new_medical_form_btn = QPushButton('📝 Medical Form', right_panel)
+        new_medical_form_btn = QPushButton('📝 ' + _t('medical_form.quick_button', 'Medical Form'), right_panel)
         new_medical_form_btn.clicked.connect(self.start_medical_form)
-        edit_checkup_btn = QPushButton('✏️ Edit Checkup', right_panel)
+        edit_checkup_btn = QPushButton('✏️ ' + _t('common.edit_checkup', 'Edit Checkup'), right_panel)
         edit_checkup_btn.clicked.connect(self.start_edit_checkup)
-        edit_session_btn = QPushButton('✏️ Edit Session', right_panel)
+        edit_session_btn = QPushButton('✏️ ' + _t('common.edit_session', 'Edit Session'), right_panel)
         edit_session_btn.clicked.connect(self.start_edit_session)
         
         action_buttons.addWidget(new_checkup_btn)
@@ -225,7 +225,7 @@ class UnifiedMainWindow(QMainWindow):
         right_layout.addLayout(action_buttons)
         
         # Records view with better styling
-        records_label = QLabel("Medical Records:", right_panel)
+        records_label = QLabel(_t('main_window.medical_records', 'Medical Records:'), right_panel)
         records_label.setProperty("class", "h3")
         right_layout.addWidget(records_label)
         
@@ -253,32 +253,34 @@ class UnifiedMainWindow(QMainWindow):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        title = QLabel("Add New Patient", tab)
+        title = QLabel(_t('patient_form.title', 'Add New Patient'), tab)
         title.setProperty("class", "h1")
         layout.addWidget(title)
 
         # Form
         form_frame = QFrame(tab)
         form_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        # Match other elevated cards for consistent light/dark theming
+        form_frame.setProperty("class", "elevated")
         form_layout = QVBoxLayout(form_frame)
         form_layout.setSpacing(12)
 
-        form_layout.addWidget(QLabel("Name *", form_frame))
+        form_layout.addWidget(QLabel(_t('patient_form.name_label', 'Name *'), form_frame))
         self.patient_name_edit = QLineEdit(form_frame)
-        self.patient_name_edit.setPlaceholderText("Enter patient full name")
+        self.patient_name_edit.setPlaceholderText(_t('patient_form.name_placeholder', 'Enter patient full name'))
         form_layout.addWidget(self.patient_name_edit)
 
-        form_layout.addWidget(QLabel("CNP *", form_frame))
+        form_layout.addWidget(QLabel(_t('patient_form.cnp_label', 'CNP *'), form_frame))
         self.patient_cnp_edit = QLineEdit(form_frame)
-        self.patient_cnp_edit.setPlaceholderText("Enter CNP (Personal Numeric Code)")
+        self.patient_cnp_edit.setPlaceholderText(_t('patient_form.cnp_placeholder', 'Enter CNP (Personal Numeric Code)'))
         self.patient_cnp_edit.setMaxLength(32)
         form_layout.addWidget(self.patient_cnp_edit)
 
         # Buttons
         button_row = QHBoxLayout()
-        clear_btn = QPushButton("Clear", form_frame)
+        clear_btn = QPushButton(_t('common.clear', 'Clear'), form_frame)
         clear_btn.clicked.connect(self.clear_patient_form)
-        save_btn = QPushButton("Add Patient", form_frame)
+        save_btn = QPushButton(_t('common.add_patient', 'Add Patient'), form_frame)
         save_btn.clicked.connect(self.save_patient)
         save_btn.setProperty("class", "primary")
         
@@ -306,7 +308,7 @@ class UnifiedMainWindow(QMainWindow):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        self.checkup_title_label = QLabel("Add New Checkup", tab)
+        self.checkup_title_label = QLabel(_t('checkup_form.title_add', 'Add New Checkup'), tab)
         self.checkup_title_label.setProperty("class", "h1")
         layout.addWidget(self.checkup_title_label)
 
@@ -320,7 +322,7 @@ class UnifiedMainWindow(QMainWindow):
         self.checkup_selector_frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.checkup_selector_frame.setVisible(False)
         selector_layout = QVBoxLayout(self.checkup_selector_frame)
-        selector_layout.addWidget(QLabel("Select Checkup to Edit:", self.checkup_selector_frame))
+        selector_layout.addWidget(QLabel(_t('common.select_checkup_edit', 'Select Checkup to Edit'), self.checkup_selector_frame))
         self.checkup_selector_list = QListWidget(self.checkup_selector_frame)
         self.checkup_selector_list.itemClicked.connect(self.load_checkup_for_edit)
         selector_layout.addWidget(self.checkup_selector_list)
@@ -332,46 +334,46 @@ class UnifiedMainWindow(QMainWindow):
         form_layout = QVBoxLayout(form_frame)
         form_layout.setSpacing(12)
 
-        form_layout.addWidget(QLabel("Date *", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.date_label', 'Date *'), form_frame))
         self.checkup_date_edit = QDateEdit(form_frame)
         self.checkup_date_edit.setCalendarPopup(True)
         self.checkup_date_edit.setDate(QDate.currentDate())
         form_layout.addWidget(self.checkup_date_edit)
 
-        form_layout.addWidget(QLabel("Chief Complaint *", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.chief_label', 'Chief Complaint *'), form_frame))
         self.checkup_chief_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.checkup_chief_edit)
 
-        form_layout.addWidget(QLabel("Medical History", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.history_label', 'Medical History'), form_frame))
         self.checkup_history_edit = QTextEdit(form_frame)
         self.checkup_history_edit.setMaximumHeight(100)
         form_layout.addWidget(self.checkup_history_edit)
 
-        form_layout.addWidget(QLabel("Examination", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.exam_label', 'Examination'), form_frame))
         self.checkup_exam_edit = QTextEdit(form_frame)
         self.checkup_exam_edit.setMaximumHeight(100)
         form_layout.addWidget(self.checkup_exam_edit)
 
-        form_layout.addWidget(QLabel("Diagnosis *", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.diagnosis_label', 'Diagnosis *'), form_frame))
         self.checkup_diagnosis_edit = QTextEdit(form_frame)
         self.checkup_diagnosis_edit.setMaximumHeight(100)
         form_layout.addWidget(self.checkup_diagnosis_edit)
 
-        form_layout.addWidget(QLabel("Treatment Plan", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.plan_label', 'Treatment Plan'), form_frame))
         self.checkup_plan_edit = QTextEdit(form_frame)
         self.checkup_plan_edit.setMaximumHeight(100)
         form_layout.addWidget(self.checkup_plan_edit)
 
-        form_layout.addWidget(QLabel("Notes", form_frame))
+        form_layout.addWidget(QLabel(_t('checkup_form.notes_label', 'Notes'), form_frame))
         self.checkup_notes_edit = QTextEdit(form_frame)
         self.checkup_notes_edit.setMaximumHeight(100)
         form_layout.addWidget(self.checkup_notes_edit)
 
         # Buttons
         button_row = QHBoxLayout()
-        clear_btn = QPushButton("Clear", form_frame)
+        clear_btn = QPushButton(_t('common.clear', 'Clear'), form_frame)
         clear_btn.clicked.connect(self.clear_checkup_form)
-        self.checkup_save_btn = QPushButton("Add Checkup", form_frame)
+        self.checkup_save_btn = QPushButton(_t('checkup_form.add_button', 'Add Checkup'), form_frame)
         self.checkup_save_btn.clicked.connect(self.save_checkup)
         self.checkup_save_btn.setProperty("class", "primary")
         
@@ -402,7 +404,7 @@ class UnifiedMainWindow(QMainWindow):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        self.session_title_label = QLabel("Add New Session", tab)
+        self.session_title_label = QLabel(_t('session_form.title_add', 'Add New Session'), tab)
         self.session_title_label.setProperty("class", "h1")
         layout.addWidget(self.session_title_label)
 
@@ -416,7 +418,7 @@ class UnifiedMainWindow(QMainWindow):
         self.session_selector_frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.session_selector_frame.setVisible(False)
         selector_layout = QVBoxLayout(self.session_selector_frame)
-        selector_layout.addWidget(QLabel("Select Session to Edit:", self.session_selector_frame))
+        selector_layout.addWidget(QLabel(_t('common.select_session_edit', 'Select Session to Edit'), self.session_selector_frame))
         self.session_selector_list = QListWidget(self.session_selector_frame)
         self.session_selector_list.itemClicked.connect(self.load_session_for_edit)
         selector_layout.addWidget(self.session_selector_list)
@@ -428,54 +430,59 @@ class UnifiedMainWindow(QMainWindow):
         form_layout = QVBoxLayout(form_frame)
         form_layout.setSpacing(12)
 
-        form_layout.addWidget(QLabel("Date *", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.date_label', 'Date *'), form_frame))
         self.session_date_edit = QDateEdit(form_frame)
         self.session_date_edit.setCalendarPopup(True)
         self.session_date_edit.setDate(QDate.currentDate())
         form_layout.addWidget(self.session_date_edit)
 
-        form_layout.addWidget(QLabel("Type *", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.type_label', 'Type *'), form_frame))
         self.session_type_combo = QComboBox(form_frame)
-        self.session_type_combo.addItems(["Follow-up", "Initial", "Telemedicine", "Emergency"])
+        self.session_type_combo.addItems([
+            _t('session_form.type_followup', 'Follow-up'),
+            _t('session_form.type_initial', 'Initial'),
+            _t('session_form.type_telemedicine', 'Telemedicine'),
+            _t('session_form.type_emergency', 'Emergency'),
+        ])
         form_layout.addWidget(self.session_type_combo)
 
-        form_layout.addWidget(QLabel("Symptoms", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.symptoms_label', 'Symptoms'), form_frame))
         self.session_symptoms_edit = QTextEdit(form_frame)
         self.session_symptoms_edit.setMaximumHeight(100)
         form_layout.addWidget(self.session_symptoms_edit)
 
-        form_layout.addWidget(QLabel("Findings", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.findings_label', 'Findings'), form_frame))
         self.session_findings_edit = QTextEdit(form_frame)
         self.session_findings_edit.setMaximumHeight(100)
         form_layout.addWidget(self.session_findings_edit)
 
-        form_layout.addWidget(QLabel("Recommendations", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.recommendations_label', 'Recommendations'), form_frame))
         self.session_reco_edit = QTextEdit(form_frame)
         self.session_reco_edit.setMaximumHeight(100)
         form_layout.addWidget(self.session_reco_edit)
 
-        form_layout.addWidget(QLabel("Medications", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.medications_label', 'Medications'), form_frame))
         self.session_meds_edit = QTextEdit(form_frame)
         self.session_meds_edit.setMaximumHeight(100)
         form_layout.addWidget(self.session_meds_edit)
 
-        form_layout.addWidget(QLabel("Next Appointment (optional)", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.next_appointment_label', 'Next Appointment (optional)'), form_frame))
         self.session_next_date_edit = QDateEdit(form_frame)
         self.session_next_date_edit.setCalendarPopup(True)
         self.session_next_date_edit.setSpecialValueText("None")
         self.session_next_date_edit.setDate(QDate.currentDate())
         form_layout.addWidget(self.session_next_date_edit)
 
-        form_layout.addWidget(QLabel("Notes", form_frame))
+        form_layout.addWidget(QLabel(_t('session_form.notes_label', 'Notes'), form_frame))
         self.session_notes_edit = QTextEdit(form_frame)
         self.session_notes_edit.setMaximumHeight(100)
         form_layout.addWidget(self.session_notes_edit)
 
         # Buttons
         button_row = QHBoxLayout()
-        clear_btn = QPushButton("Clear", form_frame)
+        clear_btn = QPushButton(_t('common.clear', 'Clear'), form_frame)
         clear_btn.clicked.connect(self.clear_session_form)
-        self.session_save_btn = QPushButton("Add Session", form_frame)
+        self.session_save_btn = QPushButton(_t('session_form.add_button', 'Add Session'), form_frame)
         self.session_save_btn.clicked.connect(self.save_session)
         self.session_save_btn.setProperty("class", "primary")
         
@@ -506,7 +513,7 @@ class UnifiedMainWindow(QMainWindow):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        self.medical_title_label = QLabel("Adult Medical Consultation Form", tab)
+        self.medical_title_label = QLabel(_t('medical_form.title', 'Adult Medical Consultation Form'), tab)
         self.medical_title_label.setProperty("class", "h1")
         layout.addWidget(self.medical_title_label)
 
@@ -521,98 +528,98 @@ class UnifiedMainWindow(QMainWindow):
         form_layout.setSpacing(12)
 
         # Location / unit info
-        form_layout.addWidget(QLabel("County (Județ)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.county_label', 'County (Județ)'), form_frame))
         self.medical_county_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_county_edit)
 
-        form_layout.addWidget(QLabel("Locality (Localitatea)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.locality_label', 'Locality (Localitatea)'), form_frame))
         self.medical_locality_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_locality_edit)
 
-        form_layout.addWidget(QLabel("Health Unit (Unitatea sanitară)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.health_unit_label', 'Health Unit (Unitatea sanitară)'), form_frame))
         self.medical_health_unit_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_health_unit_edit)
 
         # Registration / occupation
-        form_layout.addWidget(QLabel("Registration Date", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.registration_date_label', 'Registration Date'), form_frame))
         self.medical_registration_date_edit = QDateEdit(form_frame)
         self.medical_registration_date_edit.setCalendarPopup(True)
         self.medical_registration_date_edit.setDate(QDate.currentDate())
         form_layout.addWidget(self.medical_registration_date_edit)
 
-        form_layout.addWidget(QLabel("Occupation", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.occupation_label', 'Occupation'), form_frame))
         self.medical_occupation_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_occupation_edit)
 
-        form_layout.addWidget(QLabel("Workplace", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.workplace_label', 'Workplace'), form_frame))
         self.medical_workplace_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_workplace_edit)
 
-        form_layout.addWidget(QLabel("Workplace Address", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.work_address_label', 'Workplace Address'), form_frame))
         self.medical_work_address_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_work_address_edit)
 
-        form_layout.addWidget(QLabel("Working Conditions (Condiții de muncă)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.work_conditions_label', 'Working Conditions (Condiții de muncă)'), form_frame))
         self.medical_work_conditions_edit = QTextEdit(form_frame)
         self.medical_work_conditions_edit.setMaximumHeight(80)
         form_layout.addWidget(self.medical_work_conditions_edit)
 
         # Antecedents
-        form_layout.addWidget(QLabel("Hereditary History (Antecedente heredo-colaterale)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.hereditary_history_label', 'Hereditary History (Antecedente heredo-colaterale)'), form_frame))
         self.medical_hereditary_edit = QTextEdit(form_frame)
         self.medical_hereditary_edit.setMaximumHeight(80)
         form_layout.addWidget(self.medical_hereditary_edit)
 
-        form_layout.addWidget(QLabel("Personal History (Antecedente personale)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.personal_history_label', 'Personal History (Antecedente personale)'), form_frame))
         self.medical_personal_history_edit = QTextEdit(form_frame)
         self.medical_personal_history_edit.setMaximumHeight(80)
         form_layout.addWidget(self.medical_personal_history_edit)
 
         # Consultation details
-        form_layout.addWidget(QLabel("Consultation Date *", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.consultation_date_label', 'Consultation Date *'), form_frame))
         self.medical_consultation_date_edit = QDateEdit(form_frame)
         self.medical_consultation_date_edit.setCalendarPopup(True)
         self.medical_consultation_date_edit.setDate(QDate.currentDate())
         form_layout.addWidget(self.medical_consultation_date_edit)
 
-        form_layout.addWidget(QLabel("Symptoms (Simptome)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.symptoms_label', 'Symptoms (Simptome)'), form_frame))
         self.medical_symptoms_edit = QTextEdit(form_frame)
         self.medical_symptoms_edit.setMaximumHeight(100)
         form_layout.addWidget(self.medical_symptoms_edit)
 
-        form_layout.addWidget(QLabel("Diagnosis (Diagnostic)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.diagnosis_label', 'Diagnosis (Diagnostic)'), form_frame))
         self.medical_diagnosis_edit = QTextEdit(form_frame)
         self.medical_diagnosis_edit.setMaximumHeight(100)
         form_layout.addWidget(self.medical_diagnosis_edit)
 
-        form_layout.addWidget(QLabel("ICD Code (Cod)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.icd_label', 'ICD Code (Cod)'), form_frame))
         self.medical_icd_code_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_icd_code_edit)
 
-        form_layout.addWidget(QLabel("Prescriptions / Recommendations", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.prescriptions_label', 'Prescriptions / Recommendations'), form_frame))
         self.medical_prescriptions_edit = QTextEdit(form_frame)
         self.medical_prescriptions_edit.setMaximumHeight(100)
         form_layout.addWidget(self.medical_prescriptions_edit)
 
-        form_layout.addWidget(QLabel("Sick Leave Days (Zile concediu medical)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.sick_leave_days_label', 'Sick Leave Days (Zile concediu medical)'), form_frame))
         self.medical_sick_days_spin = QSpinBox(form_frame)
         self.medical_sick_days_spin.setRange(0, 365)
         form_layout.addWidget(self.medical_sick_days_spin)
 
-        form_layout.addWidget(QLabel("Certificate Number (Nr. certificat)", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.certificate_label', 'Certificate Number (Nr. certificat)'), form_frame))
         self.medical_certificate_edit = QLineEdit(form_frame)
         form_layout.addWidget(self.medical_certificate_edit)
 
-        form_layout.addWidget(QLabel("Notes", form_frame))
+        form_layout.addWidget(QLabel(_t('medical_form.notes_label', 'Notes'), form_frame))
         self.medical_notes_edit = QTextEdit(form_frame)
         self.medical_notes_edit.setMaximumHeight(80)
         form_layout.addWidget(self.medical_notes_edit)
 
         # Buttons
         button_row = QHBoxLayout()
-        clear_btn = QPushButton("Clear", form_frame)
+        clear_btn = QPushButton(_t('common.clear', 'Clear'), form_frame)
         clear_btn.clicked.connect(self.clear_medical_form)
-        save_btn = QPushButton("Save & Export PDF", form_frame)
+        save_btn = QPushButton(_t('medical_form.save_export_button', 'Save & Export PDF'), form_frame)
         save_btn.setProperty("class", "primary")
         save_btn.clicked.connect(self.save_medical_form)
 
@@ -1244,10 +1251,70 @@ class UnifiedMainWindow(QMainWindow):
         if self.current_patient_id is None:
             QMessageBox.warning(self, NO_PATIENT_TITLE, SELECT_PATIENT_MSG)
             return
-
-        self.clear_medical_form()
         self._update_medical_patient_label()
+        self._load_latest_medical_form()
         self.tabs.setCurrentIndex(4)  # Medical form tab
+
+    def _load_latest_medical_form(self) -> None:
+        """Load the most recent adult medical consultation into the form if it exists."""
+        if self.current_patient_id is None or not hasattr(self, "db"):
+            self.clear_medical_form()
+            return
+        records = self.db.get_adult_medical_consultations_for_person(self.current_patient_id)
+        if not records:
+            self.clear_medical_form()
+            return
+        latest = records[0]
+        (
+            _form_id,
+            _person_id,
+            county,
+            locality,
+            health_unit,
+            registration_date,
+            occupation,
+            workplace,
+            work_address,
+            work_conditions,
+            hereditary_history,
+            personal_history,
+            consultation_date,
+            symptoms,
+            diagnosis,
+            icd_code,
+            prescriptions,
+            _recommendations,
+            sick_leave_days,
+            certificate_number,
+            notes,
+            _created_at,
+            _updated_at,
+        ) = latest
+
+        self.medical_county_edit.setText(county or "")
+        self.medical_locality_edit.setText(locality or "")
+        self.medical_health_unit_edit.setText(health_unit or "")
+        if registration_date:
+            self.medical_registration_date_edit.setDate(QDate.fromString(registration_date, "yyyy-MM-dd"))
+        else:
+            self.medical_registration_date_edit.setDate(QDate.currentDate())
+        self.medical_occupation_edit.setText(occupation or "")
+        self.medical_workplace_edit.setText(workplace or "")
+        self.medical_work_address_edit.setText(work_address or "")
+        self.medical_work_conditions_edit.setPlainText(work_conditions or "")
+        self.medical_hereditary_edit.setPlainText(hereditary_history or "")
+        self.medical_personal_history_edit.setPlainText(personal_history or "")
+        if consultation_date:
+            self.medical_consultation_date_edit.setDate(QDate.fromString(consultation_date, "yyyy-MM-dd"))
+        else:
+            self.medical_consultation_date_edit.setDate(QDate.currentDate())
+        self.medical_symptoms_edit.setPlainText(symptoms or "")
+        self.medical_diagnosis_edit.setPlainText(diagnosis or "")
+        self.medical_icd_code_edit.setText(icd_code or "")
+        self.medical_prescriptions_edit.setPlainText(prescriptions or "")
+        self.medical_sick_days_spin.setValue(sick_leave_days or 0)
+        self.medical_certificate_edit.setText(certificate_number or "")
+        self.medical_notes_edit.setPlainText(notes or "")
 
     def _update_medical_patient_label(self) -> None:
         """Update the patient info label in the medical form tab."""
@@ -1287,7 +1354,7 @@ class UnifiedMainWindow(QMainWindow):
 
         consultation_date = self.medical_consultation_date_edit.date().toString("yyyy-MM-dd")
         if not consultation_date:
-            QMessageBox.warning(self, "Required Fields", "Consultation date is required.")
+            QMessageBox.warning(self, _t('common.required_fields', 'Required Fields'), _t('medical_form.required_date_message', 'Consultation date is required.'))
             return
 
         county = self.medical_county_edit.text().strip()

@@ -304,10 +304,13 @@
     "add_patient": "Adăugați Pacient",
     "checkup": "Evaluare",
     "session": "Ședință",
+    "medical_form": "Fișă Medicală",
     "checkup_tooltip": "Adăugați sau editați evaluări medicale pentru pacientul selectat",
     "session_tooltip": "Adăugați sau editați ședințe de terapie pentru pacientul selectat",
+    "medical_form_tooltip": "Completați și exportați fișa de consultații medicale pentru pacientul selectat",
     "checkup_disabled": "Selectați mai întâi un pacient pentru a adăuga/edita evaluări",
-    "session_disabled": "Selectați mai întâi un pacient pentru a adăuga/edita ședințe"
+    "session_disabled": "Selectați mai întâi un pacient pentru a adăuga/edita ședințe",
+    "medical_form_disabled": "Selectați mai întâi un pacient pentru a completa fișa de consultații medicale"
   },
   "patient_form": {
     "title": "Adăugați Pacient Nou",
@@ -346,5 +349,37 @@
     "type_initial": "Inițială",
     "type_telemedicine": "Telemedicină",
     "type_emergency": "Urgență"
+  },
+  "medical_form": {
+    "title": "Fișă de Consultații Medicale - Adulți",
+    "quick_button": "Fișă Medicală",
+    "county_label": "Județul",
+    "locality_label": "Localitatea",
+    "health_unit_label": "Unitatea sanitară",
+    "registration_date_label": "Data înregistrării",
+    "occupation_label": "Ocupația",
+    "workplace_label": "Locul de muncă",
+    "work_address_label": "Adresa locului de muncă",
+    "work_conditions_label": "Condiții de muncă",
+    "hereditary_history_label": "Antecedente heredo-colaterale",
+    "personal_history_label": "Antecedente personale fiziologice și patologice",
+    "consultation_date_label": "Data consultației *",
+    "symptoms_label": "Simptome",
+    "diagnosis_label": "Diagnostic",
+    "icd_label": "Cod",
+    "prescriptions_label": "Prescrieri / Recomandări",
+    "sick_leave_days_label": "Zile concediu medical",
+    "certificate_label": "Nr. certificat",
+    "notes_label": "Note",
+    "save_export_button": "Salvare și Export PDF",
+    "required_date_message": "Data consultației este obligatorie.",
+    "consultations_header": "CONSULTAȚII, INVESTIGAȚII",
+    "col_date": "Data",
+    "col_symptoms": "Simptome",
+    "col_diagnosis": "Diagnostic",
+    "col_icd": "Cod",
+    "col_prescriptions": "Prescrieri / Recomandări",
+    "col_sick_days": "Zile C.M.",
+    "col_certificate": "Nr. certificat"
   }
 }
