@@ -1,16 +1,22 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
 block_cipher = None
 
+# Entry script at project root (spec is in config/)
+spec_dir = os.path.dirname(os.path.abspath(SPEC))
+project_root = os.path.dirname(spec_dir)
+main_script = os.path.join(project_root, 'main.py')
+
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    [main_script],
+    pathex=[project_root],
     binaries=[],
     datas=[
-        ('locales/', 'locales/'),
-        ('src/', 'src/'),
-        ('assets/app_icon.ico', '.'),
-        ('assets/app_icon.png', '.'),
+        (os.path.join(project_root, 'locales'), 'locales'),
+        (os.path.join(project_root, 'src'), 'src'),
+        (os.path.join(project_root, 'assets', 'app_icon.ico'), '.'),
+        (os.path.join(project_root, 'assets', 'app_icon.png'), '.'),
     ],
     hiddenimports=[
         'PyQt6.QtCore',
@@ -28,7 +34,6 @@ a = Analysis(
         'src.utils.language_manager',
         'src.utils.app_translator',
         'src.utils.language_aware_mixin',
-        'src.ui.styles',
     ],
     hookspath=[],
     hooksconfig={},
@@ -69,7 +74,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/app_icon.ico',
+    icon=os.path.join(project_root, 'assets', 'app_icon.ico'),
 )
 
 coll = COLLECT(
