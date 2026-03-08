@@ -224,9 +224,10 @@ class UnifiedMainWindow(QMainWindow):
         action_buttons.addStretch(1)
         right_layout.addLayout(action_buttons)
         
-        # Records view with better styling
-        records_label = QLabel(_t('main_window.medical_records', 'Medical Records:'), right_panel)
+        # Records view: combined Patient, Checkups, Sessions, Medical Forms
+        records_label = QLabel(_t('main_window.record_summary', 'Record summary (Patient, Checkups, Sessions, Medical Forms)'), right_panel)
         records_label.setProperty("class", "h3")
+        records_label.setWordWrap(True)
         right_layout.addWidget(records_label)
         
         self.records_view = QTextEdit(right_panel)
@@ -769,6 +770,38 @@ class UnifiedMainWindow(QMainWindow):
                 _t('common.select_tab_info', 'Please select a patient from the Patients tab before adding or editing records.')
             )
             self.tabs.setCurrentIndex(0)  # Go back to Patients tab
+            return
+        # Combine medical record into Checkup/Session tabs: show existing records when switching
+        if index == 2 and self.current_patient_id is not None:
+            self._populate_checkup_list_for_tab()
+        elif index == 3 and self.current_patient_id is not None:
+            self._populate_session_list_for_tab()
+
+    def _populate_checkup_list_for_tab(self) -> None:
+        """Populate checkup selector with patient's checkups so record data appears in Checkup tab."""
+        if getattr(self, "db", None) is None or self.current_patient_id is None:
+            return
+        assessments = self.db.get_assessments_for_person(self.current_patient_id)
+        self.checkup_selector_list.clear()
+        for a in assessments:
+            label = f"{a[1]} - {a[5] or 'No diagnosis'}"
+            self.checkup_selector_list.addItem(label)
+            self.checkup_selector_list.item(self.checkup_selector_list.count() - 1).setData(Qt.ItemDataRole.UserRole, a[0])
+        self.checkup_selector_frame.setVisible(len(assessments) > 0)
+        self._update_checkup_patient_label()
+
+    def _populate_session_list_for_tab(self) -> None:
+        """Populate session selector with patient's sessions so record data appears in Session tab."""
+        if getattr(self, "db", None) is None or self.current_patient_id is None:
+            return
+        consultations = self.db.get_consultations_for_person(self.current_patient_id)
+        self.session_selector_list.clear()
+        for c in consultations:
+            label = f"{c[1]} - {c[2]}"
+            self.session_selector_list.addItem(label)
+            self.session_selector_list.item(self.session_selector_list.count() - 1).setData(Qt.ItemDataRole.UserRole, c[0])
+        self.session_selector_frame.setVisible(len(consultations) > 0)
+        self._update_session_patient_label()
 
     # ===== Database Integration =====
 
@@ -864,12 +897,22 @@ class UnifiedMainWindow(QMainWindow):
             f"Records: {len(assessments) + len(consultations) + len(medical_forms)} total"
         )
 
-        # Build detailed records view with HTML formatting
+        # Build combined record view: Patient, Checkups, Sessions, Medical Forms
         html_lines = []
         html_lines.append("<html><body style='font-family: sans-serif;'>")
-        
+
+        # Patient section (combine medical record into patient section)
+        section_patient = _t('main_window.section_patient', 'Patient')
+        html_lines.append(f"<h3 style='color: #607D8B; margin-top: 0;'>👤 {section_patient}</h3>")
+        html_lines.append("<div style='margin: 10px 0; padding: 10px; background: rgba(96, 125, 139, 0.08); border-left: 3px solid #607D8B;'>")
+        html_lines.append(f"<strong>{_t('main_window.name', 'Name')}:</strong> {person[1]}<br>")
+        html_lines.append(f"<strong>{_t('main_window.cnp', 'CNP')}:</strong> {person[2]}<br>")
+        reg = person[3][:10] if person[3] else '—'
+        html_lines.append(f"<strong>{_t('main_window.registered', 'Registered')}:</strong> {reg}</div>")
+
         # Checkups section
-        html_lines.append(f"<h3 style='color: #2196F3; margin-top: 10px;'>🩺 Checkups ({len(assessments)})</h3>")
+        section_checkups = _t('main_window.section_checkups', 'Checkups')
+        html_lines.append(f"<h3 style='color: #2196F3; margin-top: 20px;'>🩺 {section_checkups} ({len(assessments)})</h3>")
         if assessments:
             for a in assessments:
                 html_lines.append("<div style='margin: 10px 0; padding: 10px; background: rgba(33, 150, 243, 0.05); border-left: 3px solid #2196F3;'>")
@@ -881,10 +924,11 @@ class UnifiedMainWindow(QMainWindow):
                     html_lines.append(f"<strong>Notes:</strong> {a[8]}")
                 html_lines.append("</div>")
         else:
-            html_lines.append("<p><em>No checkups recorded</em></p>")
-        
-        # Sessions section
-        html_lines.append(f"<h3 style='color: #4CAF50; margin-top: 20px;'>💬 Therapy Sessions ({len(consultations)})</h3>")
+            html_lines.append(f"<p><em>{_t('main_window.no_checkups_recorded', 'No checkups recorded')}</em></p>")
+
+        # Sessions section (aligned with Session tab)
+        section_sessions = _t('main_window.section_sessions', 'Sessions')
+        html_lines.append(f"<h3 style='color: #4CAF50; margin-top: 20px;'>💬 {section_sessions} ({len(consultations)})</h3>")
         if consultations:
             for c in consultations:
                 html_lines.append("<div style='margin: 10px 0; padding: 10px; background: rgba(76, 175, 80, 0.05); border-left: 3px solid #4CAF50;'>")
@@ -898,10 +942,11 @@ class UnifiedMainWindow(QMainWindow):
                     html_lines.append(f"<strong>Notes:</strong> {c[9]}")
                 html_lines.append("</div>")
         else:
-            html_lines.append("<p><em>No therapy sessions recorded</em></p>")
-        
-        # Adult medical consultation forms section
-        html_lines.append(f"<h3 style='color: #9C27B0; margin-top: 20px;'>📝 Medical Forms ({len(medical_forms)})</h3>")
+            html_lines.append(f"<p><em>{_t('main_window.no_sessions_recorded', 'No sessions recorded')}</em></p>")
+
+        # Medical Forms section
+        section_forms = _t('main_window.section_medical_forms', 'Medical Forms')
+        html_lines.append(f"<h3 style='color: #9C27B0; margin-top: 20px;'>📝 {section_forms} ({len(medical_forms)})</h3>")
         if medical_forms:
             for f_rec in medical_forms:
                 (
@@ -943,8 +988,8 @@ class UnifiedMainWindow(QMainWindow):
                     html_lines.append(f"<strong>Note:</strong> {notes}")
                 html_lines.append("</div>")
         else:
-            html_lines.append("<p><em>No medical forms recorded</em></p>")
-        
+            html_lines.append(f"<p><em>{_t('main_window.no_medical_forms_recorded', 'No medical forms recorded')}</em></p>")
+
         html_lines.append("</body></html>")
         self.records_view.setHtml("\n".join(html_lines))
 
