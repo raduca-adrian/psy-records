@@ -45,7 +45,7 @@ echo.
 echo ============================================
 echo BUILD SUCCESSFUL!
 echo ============================================
-echo Executable can be found in: build\exe.win-amd64-3.13\
+echo Executable can be found in: build\exe.win-amd64-3.14\
 echo MSI installer can be found in: dist\
 echo.
 echo You can now:

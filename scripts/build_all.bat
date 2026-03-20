@@ -82,11 +82,11 @@ REM Build with cx_Freeze
 python config\setup.py build
 python config\setup.py bdist_msi
 
-if exist "build\exe.win-amd64-3.13\PsychologicalRecords.exe" (
+if exist "build\exe.win-amd64-3.14\PsychologicalRecords.exe" (
     echo cx_Freeze build: SUCCESS
     
     REM Copy cx_Freeze build to releases
-    xcopy "build\exe.win-amd64-3.13" "%RELEASE_DIR%\cx_Freeze\" /E /I /Q
+    xcopy "build\exe.win-amd64-3.14" "%RELEASE_DIR%\cx_Freeze\" /E /I /Q
     
     REM Copy MSI installer
     if exist "dist\*.msi" (

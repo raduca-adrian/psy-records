@@ -12,7 +12,7 @@ APP_LICENSE = "MIT"
 # Build configuration
 BUILD_DATE = "2025-08-06"
 BUILD_TARGET = "Windows"
-PYTHON_VERSION = "3.11+"
+PYTHON_VERSION = "3.14.3"
 
 # Dependencies
 REQUIRED_PACKAGES = [

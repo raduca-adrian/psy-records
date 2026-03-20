@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psychological-records"
+version = "1.0.0"
+description = "A secure medical records management system with multi-language support"
+readme = "docs/README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Psychological Records Team", email = "support@psychologicalrecords.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry", 
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Office/Business",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "PyQt6>=6.4.0",
+    "cryptography>=3.4.8",
+    "reportlab>=3.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=22.0.0",
+    "flake8>=4.0.0", 
+    "isort>=5.10.0",
+    "pytest>=7.0.0",
+    "pytest-qt>=4.0.0",
+]
+
+[project.scripts]
+psychological-records = "main:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.flake8]
+max-line-length = 88
+ignore = ["E203", "W503"]
+exclude = [".git", "__pycache__", "build", "dist", ".venv"]

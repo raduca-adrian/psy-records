@@ -34,13 +34,13 @@ echo.
 
 REM Test cx_Freeze build
 echo [2/3] Testing cx_Freeze build...
-if exist "build\exe.win-amd64-3.13\PsychologicalRecords.exe" (
+if exist "build\exe.win-amd64-3.14\PsychologicalRecords.exe" (
     echo   ✓ cx_Freeze executable found
     
     REM Test if application starts
     echo   Testing application startup...
     timeout /t 1 >nul
-    start "" "build\exe.win-amd64-3.13\PsychologicalRecords.exe"
+    start "" "build\exe.win-amd64-3.14\PsychologicalRecords.exe"
     timeout /t 3 >nul
     taskkill /im "PsychologicalRecords.exe" /f >nul 2>nul
     echo   ✓ Application starts successfully
